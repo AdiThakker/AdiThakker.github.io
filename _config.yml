@@ -16,7 +16,7 @@ minimal_mistakes_skin    : "default" # "air", "aqua", "contrast", "dark", "dirt"
 
 # Site Settings
 locale                   : "en-US"
-title                    : "Adi Thakker Blog"
+title                    : "Thakker's Corner"
 title_separator          : "-"
 subtitle                 : # site tagline that appears below site title in masthead
 name                     : "Adi Thakker"
@@ -93,11 +93,11 @@ analytics:
 
 # Site Author
 author:
-  name             : Adi Thakker"
+  name             : Adi Thakker
   avatar           : # path of avatar image, e.g. "/assets/images/bio-photo.jpg"
   bio              : "Software Developer / Architect / Functional Programming & Cloud Enthusiast"
   location         : "United States"
-  email            :
+  email            : "Aditya.Thakker@gmail.com"
   links:
     - label: "Email"
       icon: "fas fa-fw fa-envelope-square"

@@ -1,20 +1,25 @@
 ---
 layout: page
-title: About Mixyll
+title: About Me
 permalink: /about/
 tags: about
 ---
 
-This Jekyll theme was originally crafted by [John Otander](http://johnotander.com) as [Pixyll](https://github.com/johno/pixyll) and modified by [Sai Kiran Sripada](https://www.saikiransripada.com/).
 
-Checkout the [Github repository](https://github.com/saikiransripada/mixyll) to download it,
-request a feature, report a bug, or contribute. It's free, and open source
-([MIT](http://opensource.org/licenses/MIT)).
 
-Thanks to the following:
 
-* [Pixyll](https://github.com/johno/pixyll)
-* [BASSCSS](http://basscss.com)
-* [Jekyll](http://jekyllrb.com)
-* [Refills](http://refills.bourbon.io/)
-* [Type Scale](http://type-scale.com/)
+
+
+Greetings, 
+
+My name is Adi Thakker and i am a Software Developer / Architect / Functional Programming & Cloud Enthusiast. My current interests include; .NET, C#, F# & Azure. 
+
+I have been building software for more than 18+ years mainly using Microsoft technologies. You can find more information about me at [LinkedIn](https://www.linkedin.com/in/{{site.linkedin_username}}), or look at some of my part-time projects on [Github](https://github.com/{{site.github_username}}), or follow me on [Twitter](https://twitter.com/{{site.twitter_username}}).
+
+
+You can also contact me via [email](mailto:{{site.email}}).
+
+Happy Programming!!!
+
+Adi Thakker.
+

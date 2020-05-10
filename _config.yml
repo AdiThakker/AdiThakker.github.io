@@ -1,10 +1,10 @@
 # Site settings
-title:       Adi Thakker
+title:       Adi Thakker - Blog
 email:       Aditya.Thakker@gmail.com
 author:      Adi Thakker
-description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book."
-baseurl:     ""
-url:         "https://mixyll.saikiransripada.com"
+description: "Adi Thakker's blog"
+baseurl:     "/"
+url:         "http://github-username.github.io"
 date_format: "%b %-d, %Y"
 header_pages:
  - about.md
@@ -70,7 +70,7 @@ markdown:     kramdown
 redcarpet:
   extensions: ['smart', 'tables', 'with_toc_data']
 permalink:    :title
-paginate:     3
+paginate:     4
 sass:
   style: compressed
 plugins:

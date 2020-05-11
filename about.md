@@ -5,11 +5,6 @@ permalink: /about/
 tags: about
 ---
 
-
-
-
-
-
 Greetings, 
 
 My name is Adi Thakker and i am a Software Developer / Architect / Functional Programming & Cloud Enthusiast. My current interests include; .NET, C#, F# & Azure. 

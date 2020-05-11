@@ -12,21 +12,21 @@ If you search on-line for various [reasons](https://firstsiteguide.com/benefits-
 2. Share those learnings with others, etc.
 3. But most importantly, help me think coherently and improve my writing skills.
 
-I am sure the above list will evolve and grow, once i start blogging regularly and that brings me to my next point. 
+I am sure the above list will evolve and grow, once I start blogging regularly and that brings me to my next point. 
 
 What does "blogging regularly" mean?
 
-With so many blogging tools and resources available today, i think starting a blog is easy, the challenge is to sustain it and having the discipline to publishing content regularly. 
+With so many blogging tools and resources available today, I think starting a blog is easy, the challenge is to sustain it and having the discipline to publishing content regularly. 
 
 Like all other personal projects / hobbies / new year resolutions, the launch usually starts with all the excitement and once that wears off or other "priorities" take over, things start falling off or get replaced from the To-Do List. 
 
-Since this is my first attempt at this, i do not have a cadence to my blogging schedule....the only thing i know is that for blogging to feel natural, i just need to practice more and build the discipline to blog often. 
+Since this is my first attempt at this, I do not have a cadence to my blogging schedule....the only thing I know is that for blogging to feel natural, I just need to practice more and build the discipline to blog often. 
 
-Now, this is primarliy going to be a Technology blog, so i am sure there will be lots of learning and experience sharing and therefore there's no excuse of running out of the material. 
+Now, this is primarliy going to be a Technology blog, so I am sure there will be lots of learning and experience sharing and therefore there's no excuse of running out of the material. 
 
-So am up for this challenge? 
+So am I up for this challenge? 
 
-Well only time will tell 😊. But for now i have decided to give this a go and see where it leads. 
+Well only time will tell 😊. But for now I have decided to give this a go and see where it leads. 
 
 So Stay Tuned!!!
 

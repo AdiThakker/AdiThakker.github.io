@@ -21,7 +21,7 @@ show_social_icons:    true
 post_preview_image: false
 
 # Disqus post comments
-disqus_shortname:
+disqus_shortname: AdiThakker
 
 # Social icons
 github_username: AdiThakker

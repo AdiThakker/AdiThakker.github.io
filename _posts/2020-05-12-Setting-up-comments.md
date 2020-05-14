@@ -6,13 +6,11 @@ summary:    I wanted to make this blog interactive, so i started looking at how 
 categories: Blogging, General
 ---
 
-If you want to setup comments for your blog, there are several options and the effort ranges from minor configuration change to complete customized setup. Following are some of the options listed below:
+If you want to setup comments for your blog, there are several options and the effort ranges from minor configuration change to complete customized setup (I think that also depends on what does your Jekyll theme). 
 
-- [Static commenting](https://tlvince.com/static-commenting)
-- [Self hosted]()
-- [Third party hosted]()
+When i was looking around , I was debating between [Staticman](https://staticman.net/) and [Disqus](https://disqus.com/).
 
-For my blog, I decided to go with [Disqus](https://disqus.com/) which is third party hosted commenting system as that integration was readily available in the current theme which i am currently using for this blog. (We Disqus 😉 about the pros & cons of this approach later in this post).
+I like Staticman because it lets you keep comments along with your blog and have complete control but i finally decided to go with Disqus, which is third party hosted commenting system as that integration was readily available in the current theme which i am currently using for this blog. (We will Disqus 😉 about the pros & cons of this approach later in this post).
 
 ## So firstly, What is Disqus?
 
@@ -28,24 +26,24 @@ The service is free to use for both commenters and web sites. Web sites can pay 
 
 Setting this up for my blog was fairly straight forward as [Mixyll](https://jekyll-themes.com/mixyll/) theme did provide configuration capability. 
 
-1. I created an account with Disqus <br>
-![Setup]({{site.url}}/images/disqus-account-creation.png)
+1. Create an account with Disqus<br>
+![Setup]({{site.url}}/images/disqus-account-creation.png){:height="500px" width="300px"}
 
-2. Once that was done, I Select 2nd option - I want to install Disqus on my site <br>
-![Setup]({{site.url}}/images/disqus-account-setup.png)
+2. Once logged, select I want to install Disqus on my site <br>
+![Setup]({{site.url}}/images/disqus-account-setup.png){:height="500px" width="300px"}
 
-3. Configured new site and entered the website name. This shortname was needed for the configuration setting on my blog's _config.yml file <br>
-![Setup]({{site.url}}/images/disqus-website-setup.png)
+3. Configurea new site and enter the website name. This shortname is needed for the configuration setting on my blog's _config.yml file <br>
+![Setup]({{site.url}}/images/disqus-website-setup.png){:height="500px" width="600px"}
 
-4. Modified _config.yaml section to include the shortname for the disqus site. <br>
+4. Modify blog's _config.yaml to include the shortname for the disqus site. <br>
 ![Setup]({{site.url}}/images/disqus-config-setup.png)
 
-5. And thats it, Comments integrated!!! <br>
+5. And thats it, Comments are displayed!!! <br>
 ![Setup]({{site.url}}/images/disqus-comments-integrated.png)
 
-So it was very quick to get this integrated. There are some additional settings that you can tweak to customize it further and I'll be exploring / tweaking these after the comments start flowing on the blog 😊.
+So this was very quick, in few steps we got the commenting system integrated. There are some additional settings that you can tweak to customize it further on Disqus and I'll be exploring / tweaking these after the comments start flowing on the blog 😊.
 
-OK, so now lets talk about the pros & cons of this since Disqus is a third party hosted commenting system.
+Now finally lets talk about the pros & cons of this approach since Disqus is a third party hosted commenting system.
 
 ## Pros
 
@@ -53,9 +51,10 @@ OK, so now lets talk about the pros & cons of this since Disqus is a third party
 
 ## Cons
 
-- Comments stored on in a third-party service. This might be a big one depdending on your usage. Since this is a personal blog, its not much of an issue for me.
+- Comments stored on in a third-party service. This might be a big one depdending on your usage. Since this is a personal blog and i am just getting started, its not much of an issue for me.
 - Limited control over the user experience, look and feel, data, and <B>privacy</B>.
 - Moving your comments to a different solution could be involved as the data is hosted with third-party. 
 
-## Other Considerations
+## Other Thoughts
 
+If using Disqus starts to become a issue, i might move to Staticman as i was keenly considering it in first place.

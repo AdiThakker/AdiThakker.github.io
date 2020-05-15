@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Setting up Commenting System
-date:       2020-05-12 
+date:       2020-05-15
 summary:    I wanted to make this blog interactive, so i started looking at how to enable comments for this site. But Wait!!! This blog is based on Jekyll which is a static site generator.
 categories: Blogging, General
 ---

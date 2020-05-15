@@ -2,7 +2,7 @@
 layout:     post
 title:      Setting up Commenting System
 date:       2020-05-15
-summary:    This post explores how i enabled commenting system for my blog.
+summary:    This post explores how i enabled comments for my blog.
 categories: Blogging, General
 ---
 

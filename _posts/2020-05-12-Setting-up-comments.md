@@ -8,9 +8,9 @@ categories: Blogging, General
 
 If you want to setup comments for your blog, there are several options and the effort ranges from minor configuration change to complete customized setup (I think that also depends on what does your Jekyll theme). 
 
-When i was looking around , I was debating between [Staticman](https://staticman.net/) and [Disqus](https://disqus.com/).
+When i was looking for options, I was debating between [Staticman](https://staticman.net/) and [Disqus](https://disqus.com/).
 
-I like Staticman because it lets you keep comments along with your blog and have complete control but i finally decided to go with Disqus, which is third party hosted commenting system as that integration was readily available in the current theme which i am currently using for this blog. (We will Disqus 😉 about the pros & cons of this approach later in this post).
+I like Staticman because it lets you keep comments along with your blog and have complete control but finally decided to go with Disqus, which is third party hosted commenting system as that integration was readily available in the current theme which i am currently using for this blog. (We will Disqus 😉 about the pros & cons of this approach later in this post).
 
 ## So firstly, What is Disqus?
 
@@ -55,6 +55,8 @@ Now finally lets talk about the pros & cons of this approach since Disqus is a t
 - Limited control over the user experience, look and feel, data, and <B>privacy</B>.
 - Moving your comments to a different solution could be involved as the data is hosted with third-party. 
 
-## Other Thoughts
+## Final Thoughts
 
 If using Disqus starts to become a issue, i might move to Staticman as i was keenly considering it in first place.
+
+In the next post we will look at how to enable Google Analytics.

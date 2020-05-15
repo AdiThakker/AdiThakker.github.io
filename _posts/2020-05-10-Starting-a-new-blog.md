@@ -2,7 +2,7 @@
 layout:     post
 title:      So, Starting a new Blog!
 date:       2020-05-10 12:32:18
-summary:    My Reasons for starting a new Blog
+summary:    My reasons for starting a new Blog
 categories: Blogging, General
 ---
 
@@ -43,7 +43,7 @@ It also ties in nicely to [Github Pages](https://pages.github.com/).
 
 Learn more about Jekyll on their [website](http://jekyllrb.com/).
 
-## Blog Template 
+## Blog Theme / Template 
 [Mixyll](https://jekyll-themes.com/mixyll/) (Minimal version of [Pixyll](https://github.com/johno/pixyll)) is a simple, beautiful theme for Jekyll based on the popular Jekyll theme [Pixyll](https://github.com/johno/pixyll) by [John Otander](http://johnotander.com) that emphasizes content rather than aesthetic fluff. It's mobile _first_, fluidly responsive, and delightfully lightweight.
 
 It's pretty minimal, but leverages large type and drastic contrast to make a statement, on all devices.

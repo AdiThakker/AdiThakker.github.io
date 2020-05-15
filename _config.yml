@@ -4,7 +4,7 @@ email:       Aditya.Thakker@gmail.com
 author:      Adi Thakker
 description: "Adi Thakker's blog on Technology"
 baseurl:     "/"
-url:         "http://github-username.github.io"
+url:         "https://adithakker.github.io/"
 date_format: "%b %-d, %Y"
 header_pages:
  - about.md

@@ -35,13 +35,13 @@ Setting this up for my blog was fairly straight forward as my [theme](https://je
 3. Configure new site and enter the website name. This shortname is needed for the configuration setting in the blog's _config.yml. <br>
 ![Setup]({{site.url}}/images/disqus-website-setup.png){:height="500px" width="600px"}
 
-4. Modify _config.yaml to include the shortname for the disqus site. <br>
+4. Modify _config.yml to include the shortname for the disqus site. <br>
 ![Setup]({{site.url}}/images/disqus-config-setup.png)
 
 5. And thats it, Comments are displayed!!! <br>
 ![Setup]({{site.url}}/images/disqus-comments-integrated.png)
 
-So in just few steps I got the commenting system integrated. There are several additional settings that you can tweak to customize it further on Disqus site and I'll be exploring those once comments start flowing on the blog 😊.
+So in just few steps I got the commenting system integrated. There are several additional settings that you can tweak to customize further on Disqus site and I'll be exploring those once comments start flowing on the blog 😊.
 
 Now lets talk about some of the pros & cons of this approach since Disqus is a third party hosted commenting system.
 
@@ -49,7 +49,7 @@ Now lets talk about some of the pros & cons of this approach since Disqus is a t
 
 - Widely used.
 - Very easy to setup.
-- Responsive – mobile friendly.
+- Responsive  & mobile friendly.
 - Well integrated with other social media platforms and so eliminates the need to create new accounts on every blog. Sharing comments on these platforms is also very easy.
 
 ## Cons (partial list):

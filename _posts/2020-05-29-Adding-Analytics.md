@@ -20,9 +20,9 @@ OK, so how do I get this integrated?
 
 My current [theme](https://jekyll-themes.com/mixyll/) explains how can I use Google Analytics and also more advanced [Google Tag Manager](https://marketingplatform.google.com/about/tag-manager/), (may be I can explore that in a later post).
 
-This [link](https://support.google.com/analytics/#topic=3544906) on google's site answers tons of questions about getting started to lets look at my steps:
+This [link](https://support.google.com/analytics/#topic=3544906) on Google's site answers tons of questions about getting started so lets look at my steps:
 
-1. I already had a gmail account, so proceeded with Account Setup where I entered an account name and left the defaults checked as those are recommended. <br>
+1. Since I already had a gmail account, I proceeded straight to the Analytics Account Setup where I entered an account name and left the defaults checked as those are recommended. <br>
 ![Setup]({{site.url}}/images/Analytics-account-setup-1.png){:height="500px" width="900px"} 
 
  2. Selected the Web Option as that's what I was looking for. <br>
@@ -31,7 +31,7 @@ This [link](https://support.google.com/analytics/#topic=3544906) on google's sit
 3. Entered relevant details about my blog site and accepted user agreements. <br>
 ![Setup]({{site.url}}/images/Analytics-account-setup-3.png){:height="500px" width="900px"}
 
-4. Made note of the Tracking ID which is in the format UA-123456789-1 <br>
+4. Made note of the Tracking ID which is in the format UA-123456789-1. <br>
 
 5. Updated my _config.yml google_analytics value with that Tracking ID number. <br>
 

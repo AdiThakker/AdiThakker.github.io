@@ -9,7 +9,7 @@ date_format: "%b %-d, %Y"
 header_pages:
  - about.md
 
-google_analytics:
+google_analytics: UA-167484475-1  
 
 # Optional features
 animated:             true

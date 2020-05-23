@@ -6,7 +6,7 @@ summary:    In this post, we'll look at how to enable Google Analytics for my bl
 categories: Blogging, General
 ---
 
-Since this bog is relatively new, I do not expect much traffic. Well, how can I be certain of this? May be this blog has just taken off and lots of people are already visiting it 😉.
+Since this blog is relatively new, I do not expect much traffic. Well, how can I be certain of this? May be this blog has just taken off and lots of people are already visiting it 😉.
 
 Hmm, how can I find out more? Currently, I do not have any visibility of this data. It would be nice if I could find out information like: 
 
@@ -44,5 +44,5 @@ Cool, that was all very easy to get started... Now i'll start monitoring and see
 
 Meanwhile I'll also explore this [link](https://support.google.com/analytics/answer/9021164?hl=en&ref_topic=3544906) to further customize and understand my analytics experience. 
 
-In future posts I might also explore how to more information about my blog for search engines.
+In future posts I might also explore more information about my blog for search engines.
 

@@ -40,7 +40,7 @@ Following is the Analytics default view that showed up after my account was crea
 ![Setup]({{site.url}}/images/Analytics-account-setup-5.png){:height="500px" width="900px"} 
 ![Setup]({{site.url}}/images/Analytics-account-setup-6.png){:height="500px" width="900px"}
 
-Cool, that was all very easy to get started... Now i'll start monitoring and see what activity get logged. 
+Cool, that was all very easy to get started... Now i'll start monitoring and see what activity gets logged. 
 
 Meanwhile I'll also explore this [link](https://support.google.com/analytics/answer/9021164?hl=en&ref_topic=3544906) to further customize and understand my analytics experience. 
 

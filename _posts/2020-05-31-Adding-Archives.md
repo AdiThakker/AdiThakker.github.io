@@ -48,4 +48,4 @@ For configuring Archives, I updated the _config.yml file to include the followin
 
 For the Archives to be displayed, I had to create a new html page under _layouts to specify how I want my Archives to be displayed. 
 
-<B> NOTE: The html page name had to match with the value specified in the_config.yml file's layout key under jekyll-archives section.</B>
+<B> NOTE: </B> The html page name had to match with the value specified in the_config.yml file's layout key under jekyll-archives section.

@@ -8,6 +8,7 @@ url:         "https://adithakker.github.io/"
 date_format: "%b %-d, %Y"
 header_pages:
  - about.md
+ - archive.md
 
 google_analytics: UA-167484475-1  
 
@@ -66,7 +67,7 @@ text:
   og_locale: 'en_US'
 
 jekyll-archives:
-  enabled: []
+  enabled: all
   layout: archive
   permalinks:
     year: '/:year/'

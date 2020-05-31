@@ -76,6 +76,7 @@ sass:
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-archives
 
 exclude:
   - Gemfile

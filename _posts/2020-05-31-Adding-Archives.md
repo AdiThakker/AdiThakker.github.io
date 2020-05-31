@@ -12,4 +12,40 @@ My blog [theme](https://jekyll-themes.com/mixyll/) does not have an Archives pag
 
 So the first step was to see if there was an exisiting Archives plugin which I could just enable for this blog. The Jekyll Archives [link](https://jekyll.github.io/jekyll-archives/) sounded promising and so I decided to gave that a try:
 
-Firstly, as indicated under their getting started section, I modified _config.yml file to include 
+## Installation
+
+Firstly, as indicated under their getting started section, I included the following gem setting in the Gemfile:
+{% highlight js %}gem 'jekyll-archives'
+{% endhighlight %}
+
+Then modified the _config.yml to update the plugin sections as shown below:
+{% highlight js %}plugin:
+- jekyll-archives
+{% endhighlight %}
+
+A quick bundle install command validated the installing of the gem file as shown below:
+{% highlight HTML %}Fetching jekyll-archives 2.2.1
+Installing jekyll-archives 2.2.1
+{% endhighlight %}
+
+## Configuration
+
+### Setup
+
+For configuring Archives, I updated the _config.yml file to include the following section:
+{% highlight js %}jekyll-archives:
+  enabled: []
+  layout: archive
+  permalinks:
+    year: '/:year/'
+    month: '/:year/:month/'
+    day: '/:year/:month/:day/'
+    tag: '/tag/:name/'
+    category: '/category/:name/'
+{% endhighlight %}
+
+### Layout
+
+For the Archives to be displayed, I had to create a new html page under _layouts to specify how I want my Archives to be displayed. 
+
+<B> NOTE: The html page name had to match with the value specified in the_config.yml file's layout key under jekyll-archives section.</B>

@@ -65,6 +65,16 @@ text:
     coming_soon: 'Coming soon...'
   og_locale: 'en_US'
 
+jekyll-archives:
+  enabled: []
+  layout: archive
+  permalinks:
+    year: '/:year/'
+    month: '/:year/:month/'
+    day: '/:year/:month/:day/'
+    tag: '/tag/:name/'
+    category: '/category/:name/'
+  
 # Build settings
 markdown:     kramdown
 redcarpet:

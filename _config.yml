@@ -66,13 +66,7 @@ text:
     coming_soon: 'Coming soon...'
   og_locale: 'en_US'
 
-jekyll-archives:
-  enabled: 
-  - year
-  layout: 'year-archive'
-  permalinks:
-    year: '/archives/'
-  
+
 # Build settings
 markdown:     kramdown
 redcarpet:
@@ -84,7 +78,7 @@ sass:
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
-  - jekyll-archives
+  
 
 exclude:
   - Gemfile

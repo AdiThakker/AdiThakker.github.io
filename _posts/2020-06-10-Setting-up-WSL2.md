@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Jekyll on Windows 10 with WSL 2
-date:       2020-06-10
+date:       2020-06-07
 summary:    I wanted to install Jekyll on my personal laptop running Windows 10 for blogging and this post explores how I enabled that via WSL 2 setup. 
 categories: Blogging, Ubuntu, WSL 2, Jekyll, Windows 10
 ---
@@ -29,42 +29,11 @@ dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /nores
 After the restart, when I tried to set WSL default version to 2, I got a message stating ***WSL 2 requires an update to its kernel component***, so I proceeded with the update as shown below by downloading it from [here](https://docs.microsoft.com/en-us/windows/wsl/wsl2-kernel)
 ![Setup]({{site.url}}/images/WSL-kernel.png)
 
-Next was installing [Ubuntu](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6?activetab=pivot:overviewtab) from Windows Store, setting up username, password and 
+Next was installing [Ubuntu](https://www.microsoft.com/en-us/p/ubuntu/9nblggh4msv6?activetab=pivot:overviewtab) from Windows Store, setting up username, password, update default version to 2 and quick verification:
+![Setup]({{site.url}}/images/WSL-verify.png)
+
+I already had VS Code and git installed on my laptop so i went ahead with VS Code update and launched it from command line as indicated [here](https://docs.microsoft.com/en-us/windows/wsl/tutorials/wsl-vscode) which installed VS Code server and then launched it. Once VS Code started, it prompted me to install Remote - WSL extension, which I proceeded with. This extension enables you to use WSL as your full-time development environment directly from VS Code.
+
+OK, so the next step was to clone my repo and start installing Jekyll.
 
 
-
-First i had to update my Windows version to Well getting WSL 2 installed meant i had to download the latest version of  I added archives page to my blog which was displaying correctly on my machine, however when I pushed changes to github, it failed. 
-
-Inquiring further, I found out that the [plugin](https://jekyll.github.io/jekyll-archives/) which I used, is not supported by Github.
-
-![Setup]({{site.url}}/images/Installing-archives-setup-2.png){:height="300px" width="800px"}
-
-So I had to find an alternative solution and thanks to [this](https://dinobansigan.com/posts/adding-archive-page-to-jekyllnow-blog), I could get it working with just couple tweaks.
-
-Firstly, I updated my ***year-archive.html*** with the following (similar to the one posted in the above link):
-
- {% raw %}
- ~~~html
-<article class="page">
-  <h1>{{ page.title }}</h1>
-  <div class="entry">    
-    {% assign previousYear = "" %}
-    {% for post in site.posts %}
-      {% capture currentYear %}
-        {{ post.date | date: "%Y" }}
-      {% endcapture %}
-    
-      {% if currentYear != previousYear %}
-        {% assign previousYear = currentYear %}
-        <h3>{{ currentYear }}</h3>
-      {% endif %}
-    
-      {{ post.date | date: '%B %d, %Y' }} - <a style="font-weight: bold" href="{{ post.url }}">{{ post.title }}</a>
-      <br />
-    {% endfor %}    
-  </div>
-</article>
-~~~
-{% endraw %}
-
-And removed all the plugin references from Gemfile, _config.yml. That's It!!!

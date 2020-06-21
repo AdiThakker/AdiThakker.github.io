@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Blazor with SignalR - Series (Post 2)
-date:       2020-06-21
+date:       2020-06-22
 summary:    This is the continuation of the previous post. In this post we will see how to setup a timer in Blazor using SignalR.  
 categories: Blazor, SignalR, ASP.Net Core
 ---

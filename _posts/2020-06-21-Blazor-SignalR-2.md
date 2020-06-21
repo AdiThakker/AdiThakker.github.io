@@ -207,5 +207,7 @@ Also some of razor directives used are.
 - ***@bind*** for binding HTML elements/ properties to class properties 
 - ***@onclick*** for handler delegates  
 
-Building the project now and running it displays the timer as shown below:
+Building the project now and starting the Timer starts displaying the time on connected clients as shown below:
+
+![Setup]({{site.url}}/images/Blazor-Signalr-14.png)
 

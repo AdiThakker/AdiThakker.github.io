@@ -29,6 +29,8 @@ OK, the next step was to add SignalR Nuget components. So I added Microsoft.AspN
 If you have read about [SignalR](https://docs.microsoft.com/en-us/aspnet/core/signalr/introduction?view=aspnetcore-3.1) then you know that is uses Hub as a central component to communicate betwen clients & servers. So in the Blazor-Web.Server project, I added ***ClientHub*** class and inherited from the ***Hub*** class as shown here:
 
 ~~~csharp
+using Microsoft.AspNetCore.SignalR;
+
 namespace BlazorWeb.Server.Hubs
 {
     public class ClientHub : Hub
@@ -53,6 +55,9 @@ For the Timer functionality, the first thing I did was add a ***Timer*** class i
 ***Note:*** You can probably use the Controller class to achieve the same functionality of the TimerService class.
 
 ~~~csharp
+using System.Timers;
+using BlazorWeb.Server.Hubs;
+
  namespace BlazorWeb.Server.Services
 {
     public class TimerService

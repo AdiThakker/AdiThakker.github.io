@@ -6,11 +6,11 @@ summary:    This is the continuation of the previous post. In this post we will 
 categories: Blazor, SignalR, ASP.Net Core
 ---
 
-In the [previous]() post, we saw how to get started with Blazor and customized the default layout as shown below:
+In the [previous]({{site.url}}/Blazor-SignalR-1) post, we saw how to get started with Blazor and customized the default layout as shown below:
 
 ![Setup]({{site.url}}/images/Blazor-Signalr-11.png)
 
-In this post we continue with it and see how we can integrate Timer functionality using SignalR...
+In this post we continue with it and see how we can integrate Timer functionality using SignalR.
 
 OK, so the first thing I did after changing the layout was to clean up the default Navmenu items and other razor, controller & shared components related to it. So the layout updated to this:
 
@@ -24,7 +24,7 @@ OK, so the first thing I did after changing the layout was to clean up the defau
 </NavLink>
 ~~~
 
-The next step was to add SignalR Nuget components. So I added ***Microsoft.AspNetCore.SignalR*** library to the ***BlazorWeb.server*** project.
+The next step was to add SignalR NuGet components. So I added ***Microsoft.AspNetCore.SignalR*** library to the ***BlazorWeb.server*** project.
 
 If you have read about [SignalR](https://docs.microsoft.com/en-us/aspnet/core/signalr/introduction?view=aspnetcore-3.1) then you know that it uses Hub as a central component to communicate betwen clients & servers. So in the ***BlazorWeb.Server*** project, I added ***ClientHub*** class and inherited from the ***Hub*** class as shown here:
 
@@ -46,11 +46,9 @@ namespace BlazorWeb.Server.Hubs
 }
 ~~~
 
-Few key points about the above code is that the ***ClientHub*** class references ***TimerService*** class which encapsulates the actual timer logic. The idea is to separate client calls from server calls via the ***TimerService*** class.
+Few key points about the above code is that the ***ClientHub*** class references ***TimerService*** class which encapsulates the actual timer logic. 
 
 OK, so the next step was to code the ***TimerService*** class which is shown below: 
-
-***Note:*** You can probably use the Controller class to achieve the same functionality of the TimerService class.
 
 ~~~csharp
 using System.Timers;
@@ -92,9 +90,9 @@ using BlazorWeb.Server.Hubs;
 }
 ~~~
 
-In the above code snippet, you can see that the ***TimerService*** class accepts ***IHubContext<ClientHub> hub*** dependency and then communicates with all its clients via ***Clients.All.SendAsync method*** via the method name and appropriate parameters. Also the ***Timer_Elapsed*** handler gets called when the timer event fires. 
+In the above code snippet, you can see that the ***TimerService*** class accepts IHubContext of ClientHub generic type dependency and then communicates with all its clients via Clients.All.SendAsync method. This method takes the method name which needs to be invoked along with appropriate parameters. Also the Timer_Elapsed handler invokes all this when it gets called due to the timer event. 
 
-OK, the next step then was to modify ConfigureServices method in ***Startup.cs*** class in the ***BlazorWeb.Server*** project to hook up SignalR, and this TimerService class.  
+OK, the next step then was to modify ***ConfigureServices*** method in ***Startup.cs*** class in the ***BlazorWeb.Server*** project to hook up SignalR, and this ***TimerService*** class.  
 
 ~~~csharp
 public void ConfigureServices(IServiceCollection services)
@@ -107,7 +105,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ~~~
 
-***Note:*** The TimerService is registered as Singleton here.
+***Note:*** The TimerService is registered as Singleton here. We only want single instance of TimerService class to be created.
 
 Next, was to hook up the ***ClientHub*** in the Configure method again in ***Startup.cs*** class.
 
@@ -142,7 +140,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         }
 ~~~
 
-This was all in the BlazorWeb.Server project. Now I had to hook up the client side SignalR capability, for which i modified the ***BlazorWeb.Client*** project. First, I added the ***SignalR Microsoft.AspNetCore.SignalR.Client*** Nuget pacakage and then modified ***index.razor*** component as shown below: 
+This was all to get the ***BlazorWeb.Server*** project setup. Now I had to hook up the client side SignalR capability, for which i modified the ***BlazorWeb.Client*** project. First, I added the ***SignalR Microsoft.AspNetCore.SignalR.Client*** NuGet packaage and then modified ***index.razor*** component as shown below: 
 
 ~~~csharp
 @page "/"
@@ -199,15 +197,17 @@ This was all in the BlazorWeb.Server project. Now I had to hook up the client si
 }
 ~~~
 
-In the above code snippet, you can see how _hubConnection.On method is used to register "ReceiveTime" and "StopTime" handlers which the Server ends up calling. 
+In the above code snippet, you can see that ***_hubConnection.On*** method is used to register ReceiveTime and StopTime handlers which the Server ends up calling to invoke client communication. Also some of razor directives used are:
 
-Also some of razor directives used are. 
 - ***@using*** for importing namespaces
 - ***@inject*** for dependency injection
 - ***@bind*** for binding HTML elements/ properties to class properties 
 - ***@onclick*** for handler delegates  
 
-Building the project now and starting the Timer starts displaying the time on connected clients as shown below:
+Building the project with these changes and starting the Timer started displaying the time on connected clients as shown below:
 
 ![Setup]({{site.url}}/images/Blazor-Signalr-14.png)
 
+You can look at [this](https://github.com/AdiThakker/Blazor-Web) github repo for more details. 
+
+OK, So you can see it was relatively simple to get started with Blazor and SignalR. In the next post we will see how we can integrate this with Azure Active Directory.

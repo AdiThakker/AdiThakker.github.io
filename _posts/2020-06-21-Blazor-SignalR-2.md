@@ -140,7 +140,9 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         }
 ~~~
 
-This was all to get the ***BlazorWeb.Server*** project setup. Now I had to hook up the client side SignalR capability, for which i modified the ***BlazorWeb.Client*** project. First, I added the ***SignalR Microsoft.AspNetCore.SignalR.Client*** NuGet packaage and then modified ***index.razor*** component as shown below: 
+This was all to get the ***BlazorWeb.Server*** project setup. 
+
+Now I had to hook up the client side SignalR capability, for which I modified the ***BlazorWeb.Client*** project. First, I added the ***SignalR Microsoft.AspNetCore.SignalR.Client*** NuGet packaage and then modified ***index.razor*** component as shown below: 
 
 ~~~csharp
 @page "/"
@@ -197,17 +199,19 @@ This was all to get the ***BlazorWeb.Server*** project setup. Now I had to hook 
 }
 ~~~
 
-In the above code snippet, you can see that ***_hubConnection.On*** method is used to register ReceiveTime and StopTime handlers which the Server ends up calling to invoke client communication. Also some of razor directives used are:
+In the above code snippet, you can see that ***_hubConnection.On*** method is used to register ReceiveTime and StopTime handlers which the Server ends up calling to invoke client communication, where as the Start & Stop methods just call the hubs methods via _hubConnection.SendAsync. 
+
+Also some of razor directives used are:
 
 - ***@using*** for importing namespaces
 - ***@inject*** for dependency injection
 - ***@bind*** for binding HTML elements/ properties to class properties 
 - ***@onclick*** for handler delegates  
 
-Building the project with these changes and starting the Timer started displaying the time on connected clients as shown below:
+Building the project with these changes and starting the Timer, started displaying the time on connected clients as shown below:
 
 ![Setup]({{site.url}}/images/Blazor-Signalr-14.png)
 
-You can look at [this](https://github.com/AdiThakker/Blazor-Web) github repo for more details. 
-
 OK, So you can see it was relatively simple to get started with Blazor and SignalR. In the next post we will see how we can integrate this with Azure Active Directory.
+
+Meanwhile, you can look at [this](https://github.com/AdiThakker/Blazor-Web) github repo for details if you want to explore more.

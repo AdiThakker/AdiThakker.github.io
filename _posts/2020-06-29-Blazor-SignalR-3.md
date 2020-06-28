@@ -116,3 +116,56 @@ and the following AzureAD configuration in the appsetttings.json
     "ValidateAuthority": true
   }
 ~~~
+
+Update ***_Imports.razor*** for the  ***Microsoft.AspNetCore.Components.Authorization*** namespace
+
+Add following script tag to the index.html page in wwwwroot folder under client project.
+
+~~~html
+<script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
+~~~
+Blazor leverages various built-in components to make it easy for Authentication
+
+First, lets add RedirectToLogin.razor component under shared folder
+
+~~~csharp
+@inject NavigationManager Navigation
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@code {
+    protected override void OnInitialized()
+    {
+        Navigation.NavigateTo($"authentication/login?returnUrl=" +
+            Uri.EscapeDataString(Navigation.Uri));
+    }
+}
+~~~
+
+Add another LoginDisplay.razor component as shown here
+
+~~~csharp
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject NavigationManager Navigation
+@inject SignOutSessionStateManager SignOutManager
+
+<AuthorizeView>
+    <Authorized>
+        Hello, @context.User.Identity.Name!
+        <button class="nav-link btn btn-link" @onclick="BeginLogout">
+            Log out
+        </button>
+    </Authorized>
+    <NotAuthorized>
+        <a href="authentication/login">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task BeginLogout(MouseEventArgs args)
+    {
+        await SignOutManager.SetSignOutState();
+        Navigation.NavigateTo("authentication/logout");
+    }
+}
+~~~
+

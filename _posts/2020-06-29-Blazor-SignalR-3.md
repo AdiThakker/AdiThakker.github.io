@@ -6,35 +6,55 @@ summary:    This is the continuation of the previous post. In this post we will 
 categories: Blazor, SignalR, ASP.Net Core
 ---
 
-In the [previous]({{site.url}}/Blazor-SignalR-2) post, we saw how to get use SignalR within in Blazor
+In the previous two posts we saw, how to get [started]({{site.url}}/Blazor-SignalR-1) with Blazor and how to [integrate]({{site.url}}/Blazor-SignalR-2) SignalR.
 
-This is the final post in this series an we will see how we can leverage Azure AD for user Authentication. 
+In this third & final post of the series, we will see how we can leverage Azure AD for user Authentication. 
 
-1. Setting up Azure AD . creating Azure tenant
-First step was to create  new tenant. Following are the instructions on how to get it [here](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant)
+***NOTE:*** This is a long post but I have used several screen shots, so hopefully it'll be helpful. You can alternatively follow the [docs](https://docs.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/hosted-with-azure-active-directory?view=aspnetcore-3.1) version which is very detailed and my reference too.
 
-- Creating new User
+OK, the first thing I had to do was to setup Azure AD and that included:
+
+- Creating a new AD tenant. Refer [here](https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-create-new-tenant) for more help
+
+![Setup]({{site.url}}/images/Blazor-AAD-0.png)
+
+***Note:*** I created an initial domain name with blazorweb, so the fully qualified domain was ***blazorweb.onmicrosoft.com***
+
+- Next, was creating a new user to test Authentication.
+
 ![Setup]({{site.url}}/images/Blazor-AAD-1.png)
 
+- After that I had to register the Blazor apps (If you remember there are two, ***Blazor-Web.Server & Blazor-Web.Client***)
 
-2. Registering Apps (server side and client)
+***Note:*** Following is the screen for registering Apps in the Blazor-Web AD tenant.
+
 ![Setup]({{site.url}}/images/Blazor-AAD-2.png)
 
-3. Server side configuration
+For the server app, I just entered the appropriate name (this can be anything) with the supported account types and left the Redirect URI empty as that's not needed.
+
 ![Setup]({{site.url}}/images/Blazor-AAD-3.png)
-![Setup]({{site.url}}/images/Blazor-AAD-4.png)
+
+Then I removed all the API permissions and added a scope with the name ***API.Access*** as shown here:
+
 ![Setup]({{site.url}}/images/Blazor-AAD-5.png)
+
 ![Setup]({{site.url}}/images/Blazor-AAD-6.png)
 
-4. Client side configuration
+***Note:*** I had to make note of the ***Application ID*** & ***Tenant ID*** (you can get those values from the Overview tab) as they are needed for configuration settings.
+
+OK, next was registering the ***Blazor-Web.Client*** app and in this case I had to enter the ***Redirect URI*** value which is what gets called back after authentication (in our case its the locally hosted Blazor client app url or the default onewith port 5001)
 
 ![Setup]({{site.url}}/images/Blazor-AAD-7.png)
-![Setup]({{site.url}}/images/Blazor-AAD-8.png)
+
+For Implicit Grant I checked both available options.
+
 ![Setup]({{site.url}}/images/Blazor-AAD-9.png)
+
+And for API Permissions, I added API.Access scope from the server registration as shown here:
+
 ![Setup]({{site.url}}/images/Blazor-AAD-10.png)
 
-Install Microsoft.AspNetCore.Authentication.AzureAD.UI NuGet package
-
+Once, the apps were registed in Azur AD, I had to modify the Blazor apps for adding Azure AD  Authentication packages. So I installed Microsoft.AspNetCore.Authentication.AzureAD.UI NuGet package ad modified ConfigureServices method in the ***Startup.cs*** of the Blazor-Web.Server project.
 
 ~~~csharp
 public void ConfigureServices(IServiceCollection services)
@@ -49,7 +69,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-{
+{ 
     if (env.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
@@ -81,7 +101,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 ~~~
 
-Server appsettings.json Azure AD configuration for server is
+Once, done with that, I then modified Blazor-Web.Server project's ***appsettings.json*** to include following  Azure AD configuration for server:
 
 ~~~json
 "AzureAd": {
@@ -92,11 +112,9 @@ Server appsettings.json Azure AD configuration for server is
   }
 ~~~
 
-Import following NuGet package for the client App
+Next, was to mofify  Blazor-Web.Client project for Azure AD Authentication starting with importing  ***Microsoft.Authentication.WebAssembly.Msal*** NuGet package.
 
-Microsoft.Authentication.WebAssembly.Msal
-
-In the program.cs add the following 
+Then, I modified the ***program.cs*** to add the following:
 
 ~~~csharp
 builder.Services.AddMsalAuthentication(options =>
@@ -106,8 +124,7 @@ builder.Services.AddMsalAuthentication(options =>
 });
 ~~~
 
-
-and the following AzureAD configuration in the appsetttings.json
+and then the following AzureAD configuration in the appsetttings.json
 
 ~~~json
 "AzureAd": {
@@ -117,6 +134,7 @@ and the following AzureAD configuration in the appsetttings.json
   }
 ~~~
 
+Alright, now Blazor 
 Update ***_Imports.razor*** for the  ***Microsoft.AspNetCore.Components.Authorization*** namespace
 
 Add following script tag to the index.html page in wwwwroot folder under client project.
@@ -169,3 +187,23 @@ Add another LoginDisplay.razor component as shown here
 }
 ~~~
 
+Update App.razor with the new components
+
+~~~html
+<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
+                <NotAuthorized>
+                    <RedirectToLogin />
+                </NotAuthorized>
+            </AuthorizeRouteView>
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p>Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+~~~

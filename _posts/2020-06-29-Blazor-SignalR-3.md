@@ -1,16 +1,16 @@
 ---
 layout:     post
 title:      Blazor with SignalR - Series (Post 3)
-date:       2020-06-27
-summary:    This is the continuation of the previous post. In this post we will see how to setup a authentication using Azure AD.  
+date:       2020-06-29
+summary:    In this third & final post of the series, we will see how we can leverage Azure AD for user Authentication in our Blazor App.   
 categories: Blazor, SignalR, ASP.Net Core
 ---
 
-In the previous two posts we saw, how to get [started]({{site.url}}/Blazor-SignalR-1) with Blazor and how to [integrate]({{site.url}}/Blazor-SignalR-2) SignalR.
+In the previous two posts we saw, how to get [started]({{site.url}}/Blazor-SignalR-1) with Blazor and how to [integrate]({{site.url}}/Blazor-SignalR-2) with SignalR.
 
-In this third & final post of the series, we will see how we can leverage Azure AD for user Authentication. 
+In this post we will integrate Azure AD with our Blazor App.
 
-***NOTE:*** This is a long post but I have used several screen shots, so hopefully it'll be helpful. You can alternatively follow the [docs](https://docs.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/hosted-with-azure-active-directory?view=aspnetcore-3.1) version which is very detailed and my reference too.
+***NOTE:*** This post walks through how I got it working in my App. You can alternatively follow the [docs](https://docs.microsoft.com/en-us/aspnet/core/blazor/security/webassembly/hosted-with-azure-active-directory?view=aspnetcore-3.1) version which is very detailed and my reference too.
 
 OK, the first thing I had to do was to setup Azure AD and that included:
 
@@ -24,13 +24,13 @@ Next, was creating a new user to test Authentication.
 
 ![Setup]({{site.url}}/images/Blazor-AAD-1.png)
 
-After that I had to register the Blazor apps (If you remember there are two, ***Blazor-Web.Server & Blazor-Web.Client***)
+After that, I had to register the Blazor apps (If you remember there are two, ***Blazor-Web.Server & Blazor-Web.Client***)
 
 ***Note:*** Following is the screen for registering Apps in the Blazor-Web AD tenant.
 
 ![Setup]({{site.url}}/images/Blazor-AAD-2.png)
 
-For the server app, I just entered the appropriate name (this can be anything) with the supported account types and left the Redirect URI empty as that's not needed.
+For the server app, I just entered the appropriate name (this can be anything) and selected the appropriate supported account type. I left Redirect URI empty as that's not needed.
 
 ![Setup]({{site.url}}/images/Blazor-AAD-3.png)
 
@@ -40,9 +40,9 @@ Then I removed all the API permissions and added a scope with the name ***API.Ac
 
 ![Setup]({{site.url}}/images/Blazor-AAD-6.png)
 
-***Note:*** I had to make note of the ***Application ID*** & ***Tenant ID*** (you can get those values from the Overview tab) as they are needed for configuration settings.
+***Note:*** I had to make note of the ***Application ID*** & ***Tenant ID*** (you can get those values from the Overview tab) as they are needed for configuration settings later.
 
-OK, next was registering the ***Blazor-Web.Client*** app and in this case I had to enter the ***Redirect URI*** value which is what gets called back after authentication (in our case its the locally hosted Blazor client app url or the default onewith port 5001)
+OK, next was registering the ***Blazor-Web.Client*** app and in this case I had to enter the ***Redirect URI*** value which is what gets called back after authentication (in our case its the locally hosted Blazor client app url or the default one with port 5001)
 
 ![Setup]({{site.url}}/images/Blazor-AAD-7.png)
 
@@ -50,7 +50,7 @@ For Implicit Grant I checked both available options.
 
 ![Setup]({{site.url}}/images/Blazor-AAD-9.png)
 
-And for API Permissions, I added API.Access scope from the server registration as shown here:
+And for API Permissions, I added ***API.Access*** scope from the server registration as shown here:
 
 ![Setup]({{site.url}}/images/Blazor-AAD-10.png)
 
@@ -101,7 +101,7 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 ~~~
 
-Next, was to modify it's ***appsettings.json*** to include following  Azure AD configuration:
+Next, I modified it's ***appsettings.json*** to include following  Azure AD configuration:
 
 ~~~json
 "AzureAd": {
@@ -112,33 +112,33 @@ Next, was to modify it's ***appsettings.json*** to include following  Azure AD c
   }
 ~~~
 
-Next, was to mofify ***Blazor-Web.Client*** project for Azure AD Authentication starting with importing  ***Microsoft.Authentication.WebAssembly.Msal*** NuGet package and modifing the ***program.cs*** to add the following:
+Next, was to modify ***Blazor-Web.Client*** project for Azure AD Authentication with importing  ***Microsoft.Authentication.WebAssembly.Msal*** NuGet package and modifing the ***program.cs*** to add the following:
 
 ~~~csharp
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
-    options.ProviderOptions.DefaultAccessTokenScopes.Add("{SCOPE URI}");
+    options.ProviderOptions.DefaultAccessTokenScopes.Add("api://ca7a2acf-647d-4077-ac00-6837e146b8fb/Api.Access");
 });
 ~~~
 
-Next, was it's ***appsettings.json*** file as follows:
+Then, ***appsettings.json*** file as follows:
 
 ~~~json
 "AzureAd": {
-    "Authority": "https://login.microsoftonline.com/dd3566b9-e2d3-4191-a43d-e26588af60de",
+    "Authority": "https://login.microsoftonline.com/{YOUR AD TENANT ID}",
     "ClientId": "f6fbbd51-e7fd-48ef-bbea-87b437e391e6",
     "ValidateAuthority": true
   }
 ~~~
 
-Cool, Now Blazor leverages several built-in Authentication & Authorization components, so first I had to update ***Blazor-Web.Client*** projects ***_Imports.razor*** for the  ***Microsoft.AspNetCore.Components.Authorization*** namespace and add the following script tag to the ***index.html*** page in wwwwroot folder.
+Cool, Now Blazor leverages several built-in Authentication & Authorization components, so first I had to update ***Blazor-Web.Client*** project's ***_Imports.razor*** for the  ***Microsoft.AspNetCore.Components.Authorization*** namespace and add the following script tag to the ***index.html*** page in wwwroot folder.
 
 ~~~html
 <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
 ~~~
 
-Next was to add a new ***RedirectToLogin.razor*** component under shared folder in the client project as shown here:
+Next was to add a new ***RedirectToLogin.razor*** component (as the name indicates, it redirects the user to the correct authentication login) under shared folder in the client project as shown here:
 
 ~~~csharp
 @inject NavigationManager Navigation
@@ -152,7 +152,7 @@ Next was to add a new ***RedirectToLogin.razor*** component under shared folder 
 }
 ~~~
 
-Next another ***LoginDisplay.razor*** component as shown here:
+Next another ***LoginDisplay.razor*** component. This component displays the Login link and the authorized user name after authentication.
 
 ~~~csharp
 @using Microsoft.AspNetCore.Components.Authorization
@@ -181,7 +181,7 @@ Next another ***LoginDisplay.razor*** component as shown here:
 }
 ~~~
 
-Then, updating ***App.razor*** with the new (CascadingAuthenticationState, AuthorizeRouteView) components 
+Then, I updated ***App.razor*** with the new (CascadingAuthenticationState, AuthorizeRouteView) components 
 
 ~~~html
 <CascadingAuthenticationState>
@@ -202,7 +202,21 @@ Then, updating ***App.razor*** with the new (CascadingAuthenticationState, Autho
 </CascadingAuthenticationState>
 ~~~
 
-Running the app next, brought up some permissions screen and when proceeding further with the correct username and password, i found out that the ***Blazor-Web.Client*** app still needed admin approval, this is shown below:
+Finally updating ***MainLayout.razor*** to include the ***LoginDisplay*** component:
+
+~~~csharp
+@inherits LayoutComponentBase
+
+<div class="main">
+    <NavMenu />
+    <LoginDisplay />
+    <div class="content px-4">
+        @Body
+    </div>
+</div>
+~~~
+
+Running the app next, brought up permissions request screen and when proceeding further with the correct username and password, I found out that the ***Blazor-Web.Client*** app still needed admin approval, this is shown below:
 
 ![Setup]({{site.url}}/images/Blazor-AAD-11.png)
 
@@ -214,11 +228,12 @@ Running the app next, brought up some permissions screen and when proceeding fur
 
 ![Setup]({{site.url}}/images/Blazor-AAD-15.png)
 
-***Note:*** This was due to the fact that when I registered ***Blazor-Web.Client*** app, I had set up for requiring Admin consent. When i changed that setting by granting admin consent as shown below, everything worked:
+***Note:*** This was due to the fact that when I registered ***Blazor-Web.Client*** app, I had set up for requiring Admin consent. When I changed that setting by granting admin consent as shown below, everything worked and I was able to successfully login using Azure AD.
 
 ![Setup]({{site.url}}/images/Blazor-AAD-16.png)
 
 ![Setup]({{site.url}}/images/Blazor-AAD-17.png)
 
+Alright, there were lots of steps and this ended up being a long post with several screen captures but we got our Blazor App integrated with Azure AD. 
 
-Alright, This was a long one and showed how we could access 
+I have included the source code [here](https://github.com/AdiThakker/Blazor-Web) if you want to explore it further. Meanwhile, I hope you find this helpful!!!

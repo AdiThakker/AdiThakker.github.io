@@ -6,7 +6,7 @@ summary:    In this post, we will see how we can use Mermaid tool in Azure Devop
 categories: Azure Devops, Mermaid
 ---
 
-Hello Folks! It's been a while since i have blogged as I have been busy with client projects. 
+Hello Folks! It's been a while since I have blogged 😊, just have been busy with client projects.
 
 In the meantime, I have been thinking about some of the topics that I would like to share and one of them is using Mermaid in Azure Devops to generate sequence diagrams.
 
@@ -14,7 +14,16 @@ In several of my projects, we have been using Sequence Diagrams to show data flo
 
 In order to get started with this here are the steps:
 
-1. 
+**Note:** You will need publish code a wiki feature to be able to use this feature. More details [here](https://docs.microsoft.com/en-us/azure/devops/project/wiki/publish-repo-to-wiki?view=azure-devops&tabs=browser)
 
+Once you have this enabled, create a new project in Azure Devops as shown here:
+
+![Setup]({{site.url}}/images/mermaid-1.png)
+
+We'll keep this setup simple so, select the Wiki tab and create project wiki.
+
+![Setup]({{site.url}}/images/mermaid-2.png)
+
+![Setup]({{site.url}}/images/mermaid-3.png)
 
 If you search on-line for various [reasons](https://firstsiteguide.com/benefits-of-blogging/) why people blog, the ones that are most relevant to me are:

@@ -64,6 +64,6 @@ sequenceDiagram
 
 You can refer [here](https://mermaid-js.github.io/mermaid/diagrams-and-syntax-and-examples/examples.html#basic-sequence-diagram) to learn more about the different diagrams types
 
-So there you see it was very easy to get started with Mermaid and Azure DevOps Wiki and the best part is since this is all backed by git repo, you it can be versioned and setup as part of your CI pipeline.
+So there you see it was very easy to get started with Mermaid and Azure DevOps Wiki and the best part is since this is all backed by git repo, it can be versioned and setup as part of your CI pipeline.
 
 ![Setup]({{site.url}}/images/mermaid-6.png)

@@ -12,11 +12,13 @@ Azure provies you with [Azure Monitor](https://azure.microsoft.com/en-us/service
 
 ![Setup]({{site.url}}/images/AppInsights-1.png)
 
-There's lots you can do within Azure Monitor as shown above but for our post we will just focus on the Application Insights part. Application Insights itself lets you monitor lots metrics such as Request rates, Response times, Failure rates, Exceptions, Usage tracking, etc (you can refer to the previous link for the comprehensive list)
+There's lots you can do within Azure Monitor as shown above but for our post we will just focus on the Application Insights part. 
+
+Application Insights itself lets you monitor lots metrics such as Request rates, Response times, Failure rates, Exceptions, Usage tracking, etc (you can refer to the previous link for the comprehensive list)
 
 OK, So how do we get started:
 
-**Create Application Insights Resource**
+**First, Create Application Insights Resource**
 
 Log into your Azure subscription, select Application Insights as the resource and create an instance as shown below:
 
@@ -26,10 +28,48 @@ Once provisioned, navigate to the resource and copy the instrumentation key as w
 
 ![Setup]({{site.url}}/images/AppInsights-3.png)
 
-**Enable Application Insights in your .Net core Web App**
+**Next, Enable Application Insights in your .Net core Web App**
 
 First step to enable Application Insights is to download the appropriate NuGet pacakage as shown here:
 
 ![Setup]({{site.url}}/images/AppInsights-4.png)
 
+Then, configure the startup.cs class ConfigureServices method to include the telemetry as shown here:
+
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    // The following line enables Application Insights telemetry collection.
+    services.AddApplicationInsightsTelemetry();
+
+    services.AddControllers();
+}
+```
+
+Include the instrumentation key in the appsettings.json file as shown here:
+
+```json
+{
+  "ApplicationInsights": {
+    "InstrumentationKey": "02d1368d-c1f9-407b-bf5e-c67b59c1202e"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}
+```
+
 **Monitor**
+
+Loading the default Webforecast data automatically loads the following data out of the box as shown below
+
+![Setup]({{site.url}}/images/AppInsights-5.png)
+
+If you click on the server request chart, you can see more information showing response for the requests:
+
+![Setup]({{site.url}}/images/AppInsights-6.png)

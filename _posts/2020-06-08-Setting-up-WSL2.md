@@ -64,7 +64,7 @@ And then finally Jekyll via:
 
 ```bash
 bundle install
-gem install Jekyll
+gem install jekyll
 ```
 
 ***Note:*** when running bundle install, I got an error for nokogiri dependency which I was able to resolve by issuing command which is mentioned on their [site](https://nokogiri.org/tutorials/installing_nokogiri.html):
@@ -77,7 +77,7 @@ gem install nokogiri
 After which, I was able to successfully build the Jekyll site via:
 
 ```bash
-bundle exec Jekyll serve
+bundle exec jekyll serve
 ```
 
 There are still some minor tweaks needed for my dev env. on my personal laptop, which I'll be updating soon... but for now I am able to work on my blog from my personal laptop, So more to come!!!

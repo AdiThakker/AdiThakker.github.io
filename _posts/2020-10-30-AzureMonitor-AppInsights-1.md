@@ -64,12 +64,20 @@ Include the instrumentation key in the appsettings.json file as shown here:
 }
 ```
 
-**Monitor**
+With this basic setup, when you launch the default Webforecast controller a few times, data automatically gets collected in Application Insights resource in your azure subscription.
 
-Loading the default Webforecast data automatically loads the following data out of the box as shown below
+By default, you can see you can view Failed Requests, Server Response time, Server requests, Availability
 
 ![Setup]({{site.url}}/images/AppInsights-5.png)
 
-If you click on the server request chart, you can see more information showing response for the requests:
+You can drill down further by clicking on the individual chart, the following is when you drilled down on the server requests chart:
 
 ![Setup]({{site.url}}/images/AppInsights-6.png)
+
+Clicking on the Applcation Map shows the following:
+
+**Note: i renamed my Application Insights instance to the appriprite meaningful name**
+
+![Setup]({{site.url}}/images/AppInsights-7.png)
+
+As you can see, this is not bad at all with wuch minimal configuration. In the next post we will see how we can add custom metric logging to this and drill down into the numbers further.

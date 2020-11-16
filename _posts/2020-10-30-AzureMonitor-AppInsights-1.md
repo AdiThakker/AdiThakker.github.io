@@ -10,7 +10,7 @@ Instrumentation in your applications is very critical as it helps you understand
 
 Azure provies you with [Azure Monitor](https://azure.microsoft.com/en-us/services/monitor/) & [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) tools to implement a good instrumentation strategy for profiling your applications.
 
-There's lots you can do within Azure Monitor as shown below but for our post we will just focus on the Application Insights part. 
+There's lots you can do within Azure Monitor as shown below but for our post we will just focus on the Application Insights part.
 
 ![Setup]({{site.url}}/images/AppInsights-1.png)
 
@@ -51,7 +51,7 @@ Next, include the instrumentation key in the appsettings.json file as shown here
 ```json
 {
   "ApplicationInsights": {
-    "InstrumentationKey": "02d1368d-c1f9-407b-bf5e-c67b59c1202e"
+    "InstrumentationKey": "INSTRUMENTATION-KEY"
   },
   "Logging": {
     "LogLevel": {
@@ -76,7 +76,7 @@ You can drill down further by clicking on the individual chart, the following is
 
 ![Setup]({{site.url}}/images/AppInsights-6.png)
 
-Further clicking on the Applcation Map shows the following. **Note: I renamed my Application Insights instance to the appripriate meaningful name**
+Further clicking on the Applcation Map shows the following. **Note: I renamed my Application Insights instance to the appropriate meaningful name. You can also achieve that by using configuration, we can look at that in the next post.**
 
 ![Setup]({{site.url}}/images/AppInsights-7.png)
 

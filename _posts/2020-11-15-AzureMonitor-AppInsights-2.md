@@ -8,9 +8,9 @@ categories: Azure Monitor, Application Insights
 
 In the [previous]({{site.url}}/AzureMonitor-AppInsights-1) post, we saw how we can get started with Application Insights and integrate that into our ASP Net Core Web Application.
 
-In this continuation, we will add custom metrics to our Application Insights instrumentation and view them in Azure portal and the very first thing you will need for this is [Telemetry Client](https://docs.microsoft.com/en-us/azure/azure-monitor/app/api-custom-events-metrics). So lets get started...
+In this continuation, we will add custom metrics to our Application Insights instrumentation and view them in Azure portal and the very first thing you will need for this is [TelemetryClient](https://docs.microsoft.com/en-us/azure/azure-monitor/app/api-custom-events-metrics). So lets get started...
 
-First we verify that we have the right version of ApplicationInsights package from the project.json file:
+First we verify that we have the right version of ApplicationInsights package in the {AppName}.csproj file:
 
 ~~~xml
 <ItemGroup>
@@ -19,7 +19,7 @@ First we verify that we have the right version of ApplicationInsights package fr
 </ItemGroup>
 ~~~
 
-Then we enable the right level of logging in the appsettings.json file:
+Then we enable the right level of logging in the appsettings.json file for ApplicationInsights:
 
 ~~~json
 {
@@ -56,7 +56,7 @@ public void ConfigureServices(IServiceCollection services)
 }
 ~~~
 
-Now, TelemetryClient gives you a handy way to log  data via its TrackXXX methods, one of its parameters is of type IDictionary<string,string> and we will leverage that by adding ***CorrelationId*** and ***ZipCode*** custom properties so we can analyze how many times weather is requested for a specific zip code (just to demonstrate a simple use case 😉).
+Now, TelemetryClient gives you a handy way to log  data via its several ***TrackXXX*** methods, one of its parameters is of type IDictionary<string,string> and we will leverage that by adding ***CorrelationId*** and ***ZipCode*** custom properties so we can analyze how many times weather is requested for a specific zip code (just to demonstrate a simple use case 😉).
 
 So first we modify the constructor of the ***WeatherController.cs*** file to inject the telemetryclient as shown below:
 
@@ -82,7 +82,7 @@ private static Dictionary<string, string> AttachCustomTelemetry(Guid correlation
 }
 ~~~
 
-Now we attach those custom properties to the TrackTrace method of the TelemetryClient as shown below:
+Now we attach those custom properties to the ***TrackTrace*** method of the TelemetryClient as shown below:
 
 ~~~csharp
 [HttpGet("{zipCode}")]
@@ -100,6 +100,6 @@ When requesting weatherforecast a few times and then viewing the request informa
 
 Pretty Neat!!!
 
-So as you an see it was very easy to leverage TelemetryClient to send custom data to Application Insights. In the next part we will see how you can enable logs and use Kusto to analyze data using these custome properties. 
+So as you an see it was very easy to leverage TelemetryClient to send custom data to Application Insights. In the next part we will see how you can enable logs and use Kusto to analyze data using these custom properties.
 
-Meanwhile I would encourage you to explore [TelemetryClient](https://docs.microsoft.com/en-us/azure/azure-monitor/app/api-custom-events-metrics#prep) further as we have just used one way of logging custom properties 😊. 
+Meanwhile I would encourage you to explore [TelemetryClient](https://docs.microsoft.com/en-us/azure/azure-monitor/app/api-custom-events-metrics#prep) further as we have just used one way of logging custom properties and there are other APIs that you could use take this further 😊.

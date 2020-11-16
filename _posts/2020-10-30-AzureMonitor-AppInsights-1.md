@@ -76,7 +76,7 @@ You can drill down further by clicking on the individual chart, the following is
 
 ![Setup]({{site.url}}/images/AppInsights-6.png)
 
-Further clicking on the Applcation Map shows the following. **Note: I renamed my Application Insights instance to the appripriate meaningful name**
+Further clicking on the Applcation Map shows the following. **Note: I renamed my Application Insights instance to the appropriate meaningful name. You can also achieve that by using configuration, we can look at that in the next post.**
 
 ![Setup]({{site.url}}/images/AppInsights-7.png)
 

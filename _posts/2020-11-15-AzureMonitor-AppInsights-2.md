@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Azure Monitor and Application Insights - Series (Post 2)
-date:       2020-11-12
+date:       2020-11-15
 summary:    In this second post, we will explore how we can enable custom metrics in Application Insights.
 categories: Azure Monitor, Application Insights
 ---

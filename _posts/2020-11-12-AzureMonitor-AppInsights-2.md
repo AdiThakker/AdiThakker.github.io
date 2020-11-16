@@ -6,6 +6,16 @@ summary:    In this second post, we will explore how we can track custom metrics
 categories: Azure Monitor, Application Insights
 ---
 
+In the [previous]({{site.url}}/AzureMonitor-AppInsights-1) post, we saw how we can get started with Application Insights and integrate that into our ASP Net Core Web Application.
+
+In this continuation, we will add custom metrics to our Application Insights instrumentation and view them in Azure.
+
+The very first thing you will need is to use [Telemetry Client](https://docs.microsoft.com/en-us/azure/azure-monitor/app/api-custom-events-metrics).
+
+
+
+
+
 Instrumentation in your applications is very critical as it helps you understand how your applications are performing and thereby proactively help identify issues affecting them and the resources they depend on.
 
 Azure provies you with [Azure Monitor](https://azure.microsoft.com/en-us/services/monitor/) & [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) tools to implement a good instrumentation strategy for profiling your applications.

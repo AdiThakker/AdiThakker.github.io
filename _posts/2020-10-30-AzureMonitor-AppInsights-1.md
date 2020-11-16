@@ -10,7 +10,7 @@ Instrumentation in your applications is very critical as it helps you understand
 
 Azure provies you with [Azure Monitor](https://azure.microsoft.com/en-us/services/monitor/) & [Application Insights](https://docs.microsoft.com/en-us/azure/azure-monitor/app/app-insights-overview) tools to implement a good instrumentation strategy for profiling your applications.
 
-There's lots you can do within Azure Monitor as shown below but for our post we will just focus on the Application Insights part. 
+There's lots you can do within Azure Monitor as shown below but for our post we will just focus on the Application Insights part.
 
 ![Setup]({{site.url}}/images/AppInsights-1.png)
 

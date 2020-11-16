@@ -51,7 +51,7 @@ Next, include the instrumentation key in the appsettings.json file as shown here
 ```json
 {
   "ApplicationInsights": {
-    "InstrumentationKey": "02d1368d-c1f9-407b-bf5e-c67b59c1202e"
+    "InstrumentationKey": "INSTRUMENTATION-KEY"
   },
   "Logging": {
     "LogLevel": {

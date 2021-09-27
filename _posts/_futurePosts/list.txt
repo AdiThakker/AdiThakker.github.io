@@ -6,5 +6,8 @@
 - Durable Functions 
 - Durable Functions Actor
 - Service Bus scheduled enqueue message
+- Service Bus DR / Business Continuity
+- Function Apps DR / Business Continuity
+- Cosmos DB Consistency with DR / Business Continuity
 - Feature flags
 - ROP

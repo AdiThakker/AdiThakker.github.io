@@ -1,0 +1,9 @@
+- Sync over async (TCS)
+- Sync over async (Durable Functions)
+- Functions custom binding / late binding
+- .NET custom templates
+- .NET Source Generators
+- Durable Functions 
+- Durable Functions Actor
+- Service Bus scheduled enqueue message
+- Feature flags

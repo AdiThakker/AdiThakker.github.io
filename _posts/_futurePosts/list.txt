@@ -7,3 +7,4 @@
 - Durable Functions Actor
 - Service Bus scheduled enqueue message
 - Feature flags
+- ROP

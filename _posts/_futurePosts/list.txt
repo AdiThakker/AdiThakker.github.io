@@ -8,3 +8,4 @@
 - Service Bus scheduled enqueue message
 - Feature flags
 - Roslyn Analyzers
+- Functions (on-prem) Containers, KEDA

@@ -8,4 +8,5 @@
 - Service Bus scheduled enqueue message
 - Feature flags
 - Roslyn Analyzers
+- Resiliency in Apps using Polly (Retries, Circuit Breaker)
 - Functions (on-prem) Containers, KEDA

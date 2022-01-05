@@ -5,8 +5,9 @@
 - .NET Source Generators
 - Durable Functions 
 - Durable Functions Actor
-- Service Bus scheduled enqueue message
+- Service Bus scheduled enqueue message (DElayed REtries model)
 - Feature flags
-- Roslyn Analyzers
+- Roslyn Analyzers (around usage FEature Flags)
 - Resiliency in Apps using Polly (Retries, Circuit Breaker)
 - Functions (on-prem) Containers, KEDA
+- using Zoom it as a productivity tool

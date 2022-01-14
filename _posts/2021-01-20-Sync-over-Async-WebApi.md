@@ -62,9 +62,9 @@ app.Run();
 
 ~~~
 
-The key snippets in the above code are the *MapGet* routes are where the synchrnous and asynchronous methods are called for comparison.
+The key snippets in the above code are the *MapGet* routes where the synchronous and asynchronous methods are called for comparison.
 
-The synchrnous *GetWeather* is straight from the built-in template, so I won't go into its detail
+The synchronous *GetWeather* is straight from the built-in template, so I won't go into its detail:
 
 ~~~csharp
     private static string[] summaries = new[]
@@ -88,7 +88,7 @@ The synchrnous *GetWeather* is straight from the built-in template, so I won't g
     }
 ~~~
 
-The following asynchronous *GetWeatherAsync* method is where the action is
+The following asynchronous *GetWeatherAsync* method is where the action is:
 
 ~~~csharp
 
@@ -120,15 +120,15 @@ The following asynchronous *GetWeatherAsync* method is where the action is
 
 As you can see, the *GetWeatherAsync* method accepts a correlationId which is used as a key to track the TCS that is associated with that request. **NOTE**: We are using a concurrent dictionary *requests* to keep that association.
 
-Once the api request comes in and the association is done, it kicks off the *GetWeatherAsyncCompletion* passing in that correlationId and that is where the completion / exception of that TCS is signaled, thereby unblocking the task assoicated with that TCS of that correlation/request. 
+Once the api request comes in and the association is done, it kicks off the *GetWeatherAsyncCompletion* passing in that correlationId and that is where the completion / exception of that TCS is signaled, thereby unblocking the task assoicated with that TCS of that correlation/request. The *GetWeatherAsync* then just returns that task's result. 
 
-The *GetWeatherAsync* then just returns that task's result. So there you see folks TCS really simplifies our Sync over Async use case in this Web Api scenario. This example can be enhanced to support cancelations and  time outs and I am sure there are other ways to implement this pattern. 
-
-Feel free to share your thoughts or leave comments, if any.
+So there you see folks TCS really simplifies our Sync over Async use case in this Web Api scenario. This example can be enhanced to support cancelations and  time outs and I am sure there are other ways to implement this pattern. 
 
 BTW, in the next post we will see how we can approach this in **serverless** world using **Azure Functions**, which is what we ended up implementing in actual use case.
 
 so...stay tuned!!!
+
+Also, feel free to share your thoughts or leave comments, if any.
 
 
 

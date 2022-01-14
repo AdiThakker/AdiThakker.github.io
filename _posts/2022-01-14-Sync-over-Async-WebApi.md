@@ -11,9 +11,7 @@ While working on one my recent projects, we were faced with the requirement wher
 
 Confused? I think the following diagram explains the use case:
 
-![Setup]({{site.url}}/images/sync1.png)
-
-![Setup]({{site.url}}/images/sync2.png)
+![Setup]({{site.url}}/images/sync-over-async.png)
 
 
 In the above diagram, you can see the flow between Web Api and Service Bus topic is asynchronous, once the Web Api publishes the message to a service bus topic, it has to wait on a subscribed topic to receive its response back and only then it can unblock that synchronous request.  

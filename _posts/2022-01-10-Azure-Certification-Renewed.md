@@ -1,9 +1,9 @@
 ---
 layout:     post
 title:      Azure Certification renewed, YAY!!!
-date:       2021-01-10 12:32:18
+date:       2022-01-10 12:32:18
 summary:    Just renewed my Azure Solutions Architect certification for one more year.
-categories: Blogging, General
+categories: Certifications, Azure
 ---
 
 Happy New Year, Folks!!!

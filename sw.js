@@ -1,7 +1,7 @@
 ---
 layout: null
 ---
-var CACHE_NAME = "saikiransripada-{{site.time | date: '%Y%m%d%H%M%S'}}";
+var CACHE_NAME = "adithakker-{{site.time | date: '%Y%m%d%H%M%S'}}";
 
 self.addEventListener("install", function(e) {
   e.waitUntil(

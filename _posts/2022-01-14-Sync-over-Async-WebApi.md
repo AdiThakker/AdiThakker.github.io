@@ -3,7 +3,7 @@ layout:     post
 title:      Sync over Async Web API
 date:       2022-01-14 12:32:18
 summary:    This post explores how to leverage TaskCompletionSource to control the lifetime of a Web API request.
-categories: .NET, Web Api, 
+categories: .NET, Web Api, asynchronous 
 ---
 
 While working on one my recent projects, we were faced with the requirement where, when a web request came in, it had to be blocked for an unspecified amount of time, till an **external event signaled** for its completion and then it could unblock and return back to its caller. 

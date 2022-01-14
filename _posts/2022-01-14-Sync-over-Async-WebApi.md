@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Sync over Async Web API
-date:       2021-01-20 12:32:18
+date:       2022-01-14 12:32:18
 summary:    This post explores how to leverage TaskCompletionSource to control the lifetime of a Web API request.
 categories: .NET, Web Api, 
 ---

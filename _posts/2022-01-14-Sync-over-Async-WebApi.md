@@ -12,7 +12,7 @@ While working on one my recent projects, we were faced with the requirement wher
 Confused? I think the following diagram explains the use case:
 
 
-![Setup]({{site.url}}/images/sync-over-async.png)
+![Setup]({{site.url}}/images/sync-over-sync.png)
 
 ![Setup]({{site.url}}/images/sync.png)
 

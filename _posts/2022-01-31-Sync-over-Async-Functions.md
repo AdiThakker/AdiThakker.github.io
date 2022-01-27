@@ -12,22 +12,27 @@ For the project that i was working on, we were using serverless architecture by 
 
 Now we could have implemented this using the [Task Completion Source] pattern we saw earlier, but wait.... Functions already solves this for us 😊 by using extension called [Durable Functions](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp). 
 
-If you read through the above link, you can see that there are a quite a few stateful application patterns that can be coded using this sdk. While ours looks similar to the [Async HTTP API](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp#async-http) pattern, its not exactly the same, as we are not using polling here and instead we need a callback via topic subscription. ***NOTE: I would highly encourage you to read about the other implementations as the framework really simplifies some complex implementations like a [Saga] or [Actor]...more on that later in a future blog post 😊.
+If you read through the above link, you can see that there are a several stateful application patterns that can be coded using this sdk. While ours looks similar to the [Async HTTP API](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp#async-http) pattern, its not exactly the same, as we are not using polling here and instead we need a callback via external event (actual use case was topic subscription). 
+
+***NOTE: I would highly encourage you to read about the other implementations as the framework really simplifies some complex patterns like a [Saga](https://microservices.io/patterns/data/saga.html) or [Actor](https://en.wikipedia.org/wiki/Actor_model)...more on that later in a future blog post 😊.***
 
 
-OK, for our use case we needed External Event
+OK, so for our use case we needed an External Event callback / notification and for that, [this] (https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-external-events?tabs=csharp) API looked promising. So in order to implement this logic, we needed:
 
+- [HTTP-Triggered Client function](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-types-features-overview#client-functions): Our HTTP-triggered  non-orchestrator function, mainly for receiving Http request and starting the Orchestrator.
 
+- [Orchestrator function](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-types-features-overview#orchestrator-functions): This function starts and waits for that external event notification to resume / unblock.  
 
-Side Note about the underlyings of the framework [Durable Task Framework(https://github.com/Azure/durabletask)
+- [Topic-Triggered Client function](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-types-features-overview#client-functions): Our Topic-triggered non-orchestrator function which subscribes to the topic where the reply is expected.
+
+***NOTE: The underpining platform for Durable Functions is implemented using [Durable Task Framework](https://github.com/Azure/durabletask) library which externalizes state by persisting to Azure Storage, Azure Service Fabric and few others. Some of the key concepts such as [Task Hub](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp),  [here](https://github.com/Azure/durabletask/wiki/Core-Concepts) talk about how messages are reliably passed between orchestrations and workers
 
 
 Ok so now with this lets look at how the implementation looks....
 
 
+With this we just scratched the surface of Durable Functions....
 
-
-While working on one my recent projects, we were faced with the requirement where, when a web request came in, it had to be blocked for an unspecified amount of time, till an **external event signaled** for its completion and then it could unblock and return back to its caller. 
 
 
 Confused? I think the following diagram explains the use case:

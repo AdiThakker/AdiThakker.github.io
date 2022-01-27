@@ -30,6 +30,7 @@ OK, so for our use case we needed an External Event callback / notification and 
 
 Ok so now with this lets look at how the implementation looks....
 
+![image]({{site.url}}/images/sync-async-df.png)
 
 With this we just scratched the surface of Durable Functions....
 

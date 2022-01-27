@@ -25,137 +25,83 @@ OK, so for our use case we needed an External Event callback / notification and 
 
 - [Topic-Triggered Client function](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-types-features-overview#client-functions): Our Topic-triggered non-orchestrator function which subscribes to the topic where the reply is expected.
 
-***NOTE: The underpining platform for Durable Functions is implemented using [Durable Task Framework](https://github.com/Azure/durabletask) library which externalizes state by persisting to Azure Storage, Azure Service Fabric and few others. Some of the key concepts such as [Task Hub](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp),  [here](https://github.com/Azure/durabletask/wiki/Core-Concepts) talk about how messages are reliably passed between orchestrations and workers
+***NOTE: The underpining platform for Durable Functions is implemented using [Durable Task Framework](https://github.com/Azure/durabletask) library which manages and externalizes state by persisting to Azure Storage, Azure Service Fabric and few other options.*** 
+
+We will see hone one of the key element [Task Hub](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp) is highly leveraged for coordinating orchestrations and tasks and   [here](https://github.com/Azure/durabletask/wiki/Core-Concepts) talk about how messages are reliably passed between orchestrations and workers
 
 
-Ok so now with this lets look at how the implementation looks....
+Ok so now with this lets look at how the implementation looks. I have uploaded the simplified code [here](https://github.com/AdiThakker/SyncOverAsync_Functions) 
 
 ![image]({{site.url}}/images/sync-async-df.png)
 
-With this we just scratched the surface of Durable Functions....
+***NOTE: This sample uses .NET 6 and Functions ver. 4, so you will not see Program.cs file and it also leverages some of the new features like globalusings, OpenAPI support etc.***
 
-
-
-Confused? I think the following diagram explains the use case:
-
-![image]({{site.url}}/images/sync-async.png)
-
-
-In the above diagram, you can see the flow between Web Api and Service Bus topic is asynchronous, once the Web Api publishes the message to a service bus topic, it has to wait on a subscribed topic to receive its response back and only then it can unblock that synchronous request.  
-
-
-The requirement that made this interesting was associating the asynchronous action (*in this case, service bus topic subscription callback*) back to its synchronous operation **without leaving that method's body**.
-
-
-Now, we are all aware of the [Asynchronous Programming Patterns](https://docs.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/) and [Task](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-6.0) constructs in .NET, so this was going to be at the center of this use case and therefore I needed something which could allow me to act as a producer of a task and at the same time control that task's lifetime and that's where our old friend [Task Completion Source](https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskcompletionsource?view=net-6.0) comes into action.
-
-
-The key thing with TCS is that there is no scheduled delegate associated with it and therefore you can control the lifetime of its encapsulated task by calling its SetResult, SetException and SetCanceled and other methods. 
-
-
-I would encourage you to read [this](https://devblogs.microsoft.com/pfxteam/the-nature-of-taskcompletionsourcetresult/) excellent article by Stephen Toub to find out more about TCS. 
-
-
-So equiped with this, lets look at how the code looks. **NOTE:** I have simplified the [code](https://github.com/AdiThakker/SyncOverAsync) to demonstrate the logic. This is in no way production ready 😊
-
-
-- This sample follows the [minimal Web Api](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/minimal-apis?view=aspnetcore-6.0) and the initial scaffolding is straight out of the box. 
+So the class that implments this functionality is ***SyncOverASyncApi.cs*** and the key snipptes are shown below:
 
 ~~~csharp
 
-using Microsoft.OpenApi.Models;
-using System.Collections.Concurrent;
+    private const string OrchestrationFunctionName = "Sync-Over-Async-Api-DurableFunction";
+    const string OrchestrationComplete = "weather_async_response";
 
-// Create builder
-var builder = WebApplication.CreateBuilder(args);
+    public SyncOverAsyncApi(ILogger<SyncOverAsyncApi> logger) => Logger = logger;
 
-// register services
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(_ => _.SwaggerDoc("v1", new OpenApiInfo { Title = "Sync Over Async API", Description = "Example showing use of TCS to control task completion", Version = "v1" }));
-
-// build
-var app = builder.Build();
-
-// use services
-app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sync Over Async API V1"));
-
-// Add Routes
-app.MapGet("/weatherforecastsync", () => WeatherForecast.GetWeather());
-app.MapGet("/weatherforecastasync", async () => await WeatherForecast.GetWeatherAsync(Random.Shared.Next(int.MaxValue).ToString()));
-
-// Run
-app.Run();
-
-~~~
-
-The key snippets in the above code are the *MapGet* routes where the synchronous and asynchronous methods are called for comparison.
-
-The synchronous *GetWeather* is straight from the built-in template, so I won't go into its detail:
-
-~~~csharp
-    private static string[] summaries = new[]
+    [FunctionName("SyncOverAsyncApi_WeatherRequest")]
+    [OpenApiOperation(operationId: "GetWeatherAsync", tags: new[] { "weather" })]
+    [OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
+    public async Task<HttpResponseMessage> GetWeatherAsync([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestMessage req,
+        [DurableClient] IDurableOrchestrationClient starter)
     {
-        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-    };
+        // Generate a random request Id
+        var requestId = randomGenerator.Next(Int32.MaxValue).ToString();
 
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+        // Start new orchestration
+        await starter.StartNewAsync(OrchestrationFunctionName, requestId.ToString());
+        this.Logger.LogInformation($"Started orchestration for {requestId}");
 
-    public static WeatherForecast[] GetWeather()
+        // Wait for orchestration to complete or timeout to occur
+        var completion = await starter.WaitForCompletionOrCreateCheckStatusResponseAsync(req, requestId.ToString(), TimeSpan.FromSeconds(60));
+        if (completion.StatusCode != HttpStatusCode.OK)
+        {
+            await starter.TerminateAsync(requestId, "Timeout Occured"); // Log additional context (if any)
+            return new HttpResponseMessage(HttpStatusCode.InternalServerError);
+        }
+
+        return completion;
+    }
+
+    [FunctionName(OrchestrationFunctionName)]
+    public async Task<string> RunOrchestrator([OrchestrationTrigger] IDurableOrchestrationContext context) => await context.WaitForExternalEvent<string>(OrchestrationComplete);
+
+    [FunctionName("SyncOverAsyncApi_WeatherReply")]
+    public async Task WeatherReply([BlobTrigger("weather-results/{name}", Connection = "blobConnection")] Stream myBlob, string name,
+                                   [DurableClient] IDurableOrchestrationClient client)
     {
-       var forecast = Enumerable.Range(1, 5).Select(index =>
-       new WeatherForecast
-       (
-           DateTime.Now.AddDays(index),
-           Random.Shared.Next(-20, 55),
-           summaries[Random.Shared.Next(summaries.Length)]
-       ))
-        .ToArray();
-        return forecast;
+        var requestId = name.Remove(name.IndexOf('.'));
+        await client.RaiseEventAsync(requestId, OrchestrationComplete, new StreamReader(myBlob).ReadToEnd());
+        this.Logger.LogInformation($"Received reply for Request:{name}");
     }
 ~~~
 
-The following asynchronous *GetWeatherAsync* method is where the action is:
+In the above snippet, you can see that once a request is received, the DurableClient in the ***GetWeatherASync*** method starts a new Orchestration by calling ***StartNewAsync*** passing in the Orchestration Function Name and the request id. It then waits for that orchestration to complete or timeout (60 seconds) to occur by awaiting ***WaitForCompletionOrCreateCheckStatusResponseAsync***
 
-~~~csharp
+The ***RunOrchestrator*** our Orchestrator Function gets invoked, it uses the OrchestrationTrigger's context's ***WaitForExternalEvent*** method by passing in the event name.
 
-   static ConcurrentDictionary<string, TaskCompletionSource<WeatherForecast[]>> requests = new ConcurrentDictionary<string, TaskCompletionSource<WeatherForecast[]>>();
+The ***WeatherReply*** function is our External Event subscriber(i have used Blob trigger instead of Service Bus Topic) since i was testing it locally but the idea remains the same.
 
-    public static async Task<WeatherForecast[]> GetWeatherAsync(string correlationId)
-    {
-        TaskCompletionSource<WeatherForecast[]> tcs = new TaskCompletionSource<WeatherForecast[]>(correlationId);
-        requests.TryAdd(correlationId, tcs);
-        await GetWeatherAsyncCompletion(correlationId);
-        return await tcs.Task;
-    }
-
-    private static async Task GetWeatherAsyncCompletion(string correlationId)
-    {
-        // simulate background process such as listening on Service Bus topic / external call back, etc.
-        // this callback would retrieve the correlationid to signal completion of asynchronous task associated to the 
-        // synchronous request
-        await Task.Delay(10000);
-
-        // Get the tcs that matches the correlationId
-        if (requests.TryGetValue(correlationId, out TaskCompletionSource<WeatherForecast[]> tcs))
-            tcs.SetResult(GetWeather());
-        else
-            tcs.SetException(new Exception("Invalid request"));
-    }
-
-~~~
-
-As you can see, the *GetWeatherAsync* method accepts a correlationId which is used as a key to track the TCS that is associated with that request. **NOTE**: We are using a concurrent dictionary *requests* to keep that association.
-
-Once the api request comes in and the association is done, it kicks off the *GetWeatherAsyncCompletion* passing in that correlationId and that is where the completion / exception of that TCS is signaled, thereby unblocking the task assoicated with that TCS of that correlation/request. The *GetWeatherAsync* then just returns that task's result. 
-
-So there you see folks TCS really simplifies our Sync over Async use case in this Web Api scenario. This example can be enhanced to support cancelations and  time outs and I am sure there are other ways to implement this pattern. 
-
-BTW, in the next post we will see how we can approach this in **serverless** world using **Azure Functions**, which is what we ended up implementing in actual use case.
-
-so...stay tuned!!!
-
-Also, feel free to share your thoughts or leave comments, if any.
+Once that function is invoked, it calls the DurableClient's ***RaiseEventAsync*** to complete it.
 
 
+Following is the snapshot of how the state is maintained in my local storage emulator
 
+- TaskHubName
+
+
+-- Container
+
+
+-- Status Table
+
+So there you see folks, implementing this pattern was really easy using Durable Functions. As you can see with the stateful patterns that are supported, we just scratched the surface.
+
+
+More to come!!!!

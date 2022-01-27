@@ -1,10 +1,31 @@
 ---
 layout:     post
-title:      Sync over Async Web API
-date:       2022-01-14
-summary:    This post explores how to leverage TaskCompletionSource to control the lifetime of a Web API request.
-categories: .NET, Web Api, Asynchronous 
+title:      Sync over Async Web API - Durable Functions
+date:       2022-01-31
+summary:    This post builds on previous post and explores how to implement same logic via Durable Functions.
+categories: .NET, Web Api, Asynchronous, Durable Functions 
 ---
+
+In the [previous]({{site.url}}/Sync-over-Async-WebApi) post we explored how you could control completion of a synchronous web request over an asynchronous event by using [Task Completion Source]((https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.taskcompletionsource?view=net-6.0)) and that was good for understanding the pattern. 
+
+For the project that i was working on, we were using serverless architecture by leveraging [Azure Functions](https://azure.microsoft.com/en-us/services/functions/#features) and as a principle stayed with stateless functions and avoided stateful implementations... but this specific use case now required us to maintain some state (i.e. the incoming request) and only unblock it when an external event (like messaging topic received its reply). (TODO... reword this). 
+
+Now we could have implemented this using the [Task Completion Source] pattern we saw earlier, but wait.... Functions already solves this for us 😊 by using extension called [Durable Functions](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp). 
+
+If you read through the above link, you can see that there are a quite a few stateful application patterns that can be coded using this sdk. While ours looks similar to the [Async HTTP API](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-overview?tabs=csharp#async-http) pattern, its not exactly the same, as we are not using polling here and instead we need a callback via topic subscription. ***NOTE: I would highly encourage you to read about the other implementations as the framework really simplifies some complex implementations like a [Saga] or [Actor]...more on that later in a future blog post 😊.
+
+
+OK, for our use case we needed External Event
+
+
+
+Side Note about the underlyings of the framework [Durable Task Framework(https://github.com/Azure/durabletask)
+
+
+Ok so now with this lets look at how the implementation looks....
+
+
+
 
 While working on one my recent projects, we were faced with the requirement where, when a web request came in, it had to be blocked for an unspecified amount of time, till an **external event signaled** for its completion and then it could unblock and return back to its caller. 
 

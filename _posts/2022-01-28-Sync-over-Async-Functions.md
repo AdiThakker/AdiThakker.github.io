@@ -87,7 +87,7 @@ The ***RunOrchestrator method***, which is our Orchestrator function gets invoke
 
 The ***WeatherResponse method*** is our external Event subscriber for Blob trigger. Once that function is invoked, it calls the DurableClient's ***RaiseEventAsync*** to complete the event.
 
-The glue to all of the above methods are [Orchestration Client](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=csharp#orchestration-client) and [Orchestration Context](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=csharp#orchestration-trigger)
+The glue to all of the above code is [Orchestration Client](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=csharp#orchestration-client) and [Orchestration Context](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-bindings?tabs=csharp#orchestration-trigger)
 
 ***NOTE: The underpining platform for Durable Functions is implemented using [Durable Task Framework](https://github.com/Azure/durabletask) library which manages, externalizes state by persisting to Azure Storage, Azure Service Fabric, etc. The construct of [Task Hub](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-task-hubs?tabs=csharp) is highly used for storing orchestration instances and history. You can read further about several of these [here](https://github.com/Azure/durabletask/wiki/Core-Concepts).*** 
 
@@ -99,4 +99,6 @@ Where as the ***TestHubNameHistory*** table maintains the complete history of al
 
 ![image]({{site.url}}/images/sync-async-df-2.png)
 
-So there you see folks, we have just scratched the surface of Durable functions and it is very powerful. BTW, I am also very excited to read about their inclusion in the isolated process model in its [roadmap](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/net-on-azure-functions-roadmap/ba-p/2197916), so more to explore!!!!
+So there you see folks, we have just scratched the surface of Durable functions and it is very powerful. 
+
+BTW, I am also very excited to read about their availability in the isolated process model in its [roadmap](https://techcommunity.microsoft.com/t5/apps-on-azure-blog/net-on-azure-functions-roadmap/ba-p/2197916), so more to explore!!!!

@@ -25,7 +25,7 @@ The above method ***CleanUpOldWeatherResponsesAsync*** is straightforward, it ex
 
 ***NOTE: If you test this locally, you might run into [BadRequest](https://github.com/Azure/azure-functions-durable-extension/issues/2007) issue depending on your setup***.
 
-Finally, there are some performance considertions to take into account when using these APIs, if you need an alternative way to clean up your taskhub state, refer to [this](https://dev.to/cgillum/resetting-your-durable-task-hubs-azure-storage-state-2ome) article by Chris Gillum.
+Finally, there are some performance considerations to take into account when using these APIs, if you need an alternative / faster way to clean up your taskhub state, refer to [this](https://dev.to/cgillum/resetting-your-durable-task-hubs-azure-storage-state-2ome) article by Chris Gillum.
 
 
 

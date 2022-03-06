@@ -60,7 +60,120 @@ The below class diagram shows what are the different classes involved in constru
 ![image]({{site.url}}/images/classes-et-1.png)
 
 
-- [RulesBuilder]() This class, as the name indicates is mainly responsible for building the Rules engine runtime by looking at the [RulesConfiguration]() and  
+- [RulesEngineService](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs) This is the entry function code that interacts with the Rules logic code. This logic is part of the function app which registers all the dependencies in the [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) as shown below:
+
+~~~csharp
+public override void Configure(IFunctionsHostBuilder builder)
+{
+    if (builder is null)
+        throw new ArgumentNullException(nameof(builder));
+
+    // Register dependencies
+    builder.Services.AddLogging();
+
+    // Register Rules
+    builder.Services.AddTransient(typeof(ForwardRule));
+    builder.Services.AddTransient(typeof(EscalateRule));
+
+    // Register Builder
+    builder.Services.AddOptions<RulesConfiguration>().Configure<IConfiguration>((settings, configuration) => configuration.GetSection(nameof(RulesConfiguration)).Bind(settings));
+    builder.Services.AddSingleton<IRulesBuilder<RuleContext, RuleResult>>(sp =>
+    {
+        var configuration = sp.GetRequiredService<IOptions<RulesConfiguration>>();
+        Dictionary<string, IRule<RuleContext, RuleResult>> ruleLookup = new Dictionary<string, IRule<RuleContext, RuleResult>>
+        {
+            { "Forward", sp.GetRequiredService<ForwardRule>() },
+            { "Escalate", sp.GetRequiredService<EscalateRule>() }
+        };
+        return new RulesBuilder(configuration, ruleLookup);
+    });
+
+    // Register Executor
+    builder.Services.AddSingleton<IRulesExecutor<RuleContext, RuleResult>>(sp =>
+    {
+        return new RulesExecutor(sp.GetRequiredService<IRulesBuilder<RuleContext, RuleResult>>(), sp.GetRequiredService<ILogger<RulesExecutor>>());     
+    });
+
+}
+~~~
+
+- [RulesConfiguration](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RulesConfiguration.cs) This is the rules configuration object that's mapped from [appsettings.json](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) 
+
+
+- [RulesBuilder](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Builder/RulesBuilder.cs) This class, as the name indicates is mainly responsible for building the execution runtime by looking at rules configuration
+
+Key methods include:
+
+~~~csharp
+public IDictionary<Func<RuleContext, bool>, (bool, IEnumerable<IRule<RuleContext, RuleResult>>)> Build()
+{
+    return this.Configuration.Configurations.Aggregate(new ConcurrentDictionary<Func<RuleContext, bool>, (bool, IEnumerable<IRule<RuleContext, RuleResult>>)>(), (rules, config) =>
+    {
+        rules.TryAdd(this.GenerateRuleCriteria(config.Criteria),(false, config.Rules.Select(rule => this.Rules[rule])));
+        return rules;
+    });
+}
+
+private Func<RuleContext, bool> GenerateRuleCriteria(string criteria)
+{
+    var paramExpression = Expression.Parameter(typeof(RuleContext), "context");
+    var criteriaBody = criteria.Split(" ", StringSplitOptions.RemoveEmptyEntries);
+    (string[] Properties, string[] Values) parseExpressions = (criteriaBody[0].Split("-", StringSplitOptions.RemoveEmptyEntries), criteriaBody[2].Split("-", StringSplitOptions.RemoveEmptyEntries));
+    Expression bodyExpression = default;
+    for (int i = 0; i < parseExpressions.Properties.Length; i++)
+    {
+        Expression propertyExpression;
+        (Expression Left, Expression Right) expression = BuildPropertyAccessExpression(typeof(RuleContext), paramExpression, parseExpressions.Properties[i], parseExpressions.Values[i]);
+        if (criteriaBody[1].Equals("==", StringComparison.InvariantCulture))
+            propertyExpression = Expression.Equal(expression.Left, expression.Right);
+        else
+            propertyExpression = Expression.NotEqual(expression.Left, expression.Right);
+
+        bodyExpression = i == 0 ? propertyExpression : Expression.AndAlso(bodyExpression, propertyExpression);
+    }
+    
+    return Expression.Lambda<Func<RuleContext, bool>>(bodyExpression, paramExpression).Compile();
+
+    (Expression, Expression) BuildPropertyAccessExpression(Type type, ParameterExpression paramExpression, string propertyName, string propertyValue)
+    {
+        return (type.GetProperty(propertyName) != null)
+            ? (Expression.Property(paramExpression, propertyName), Expression.Constant(propertyValue, typeof(string)))
+            : (Expression.Property(Expression.Property(paramExpression, "Parameters"), "Item", Expression.Constant(propertyName, typeof(string))), Expression.Constant(propertyValue, typeof(string)));
+    }
+}
+~~~
+
+- [RuleExecutor](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Executor/RulesExecutor.cs) This class is the actual run time execution of rules. The method that has that logic is shown below:
+
+~~~csharp
+public IEnumerable<Task<RuleResult>> Execute(RuleContext input)
+{
+    IEnumerable<IRule<RuleContext,RuleResult>>? GetRulesToExecute(RuleContext input)
+    {
+        // Get Rules to execute
+        var matches = rulesConfiguration
+                        .Where(configuration => configuration.Key(input))
+                        .Select(criteria => new { Priority = criteria.Value.Item1, Rules = criteria.Value.Item2 });
+
+        if (matches.Any())
+            return matches.FirstOrDefault(match => match.Priority == true)?.Rules ?? matches.FirstOrDefault()?.Rules;
+
+        return default;
+    };
+
+    var rules = GetRulesToExecute(input);
+    if(rules != null && rules.Any())
+        return rules.Select(rule => rule.ExecuteAsync(input));
+
+    throw new InvalidOperationException($"No rule to execute for {input.Source} with {input.ContextType}");
+}
+~~~
+
+- [ForwardRule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/ForwardRule.cs), [EscalateRule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/EscalateRule.cs) are the actual rules that get executed when the criteria matches.
+
+As you can see in the following output, correct rule being executed when criteria is met.
+
+![image]({{site.url}}/images/classes-et-1.png)
 
 All ths source code is avaialable [here]() and it leverages the custom template that we discussed in the [previous post]()
 

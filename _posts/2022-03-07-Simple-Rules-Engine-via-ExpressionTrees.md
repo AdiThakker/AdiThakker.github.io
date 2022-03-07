@@ -200,7 +200,7 @@ I am sure this logic can be implemented in other different ways. Would like to h
 
 Anyways, All of the source code is available [here](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine), if you want to explore this further. 
 
-***NOTE: BTW his code also leverages the custom function template that we discussed in one of the [previous post]({{site.url}}/Sync-over-Async-Function)***
+***NOTE: BTW his code also leverages the custom function template that we discussed in one of the [previous post]({{site.url}}/Sync-over-Async-Functions)***
 
 Cheers!!!
 

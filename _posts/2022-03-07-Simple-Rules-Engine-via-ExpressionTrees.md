@@ -60,7 +60,7 @@ To elaborate the setup further, lets look at the diagram below which shows what 
 ![image]({{site.url}}/images/classes-et-1.png)
 
 
-- [Rules Engine Service Function](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs): This function is the client code and is the caller to the Rules engine logic.
+- [Rules Engine Service Function](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs): This function is the client code and is the caller to the Rules engine logic (mainly the Rules Executor class, which is explained futher). It passes the [Rules Context](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs) object by setting the appropriate properties to demonstrate the setup. 
 
 ~~~csharp
 [FunctionName("Dispatcher")]
@@ -82,7 +82,7 @@ public async Task<IActionResult> Dispatcher(
 }
 ~~~
 
-DI is leveraged in [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) as shown below:
+Also shown below is the [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) code for registering dependencies.
 
 ~~~csharp
 public override void Configure(IFunctionsHostBuilder builder)
@@ -119,12 +119,9 @@ public override void Configure(IFunctionsHostBuilder builder)
 }
 ~~~
 
-All the data points  / properties are wrapped in [Rules Context](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs) object and is pased along downstream.
-
-
 - [Rules Builder](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Builder/RulesBuilder.cs) This class, as the name indicates is mainly responsible for building the execution runtime by looking at [RulesConfiguration](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RulesConfiguration.cs) object that's mapped from [appsettings.json](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) 
 
-The main logic for constructing all of this is shown below:
+This is main glue and where all the magic happens. Shown below is the logic for constructing all of this:
 
 ~~~csharp
 public IDictionary<Func<RuleContext, bool>, (bool, IEnumerable<IRule<RuleContext, RuleResult>>)> Build()
@@ -165,13 +162,13 @@ private Func<RuleContext, bool> GenerateRuleCriteria(string criteria)
 }
 ~~~
 
-In the above snippet, you can see that ***GenerateRuleCriteria*** is the main method that parses the configuration to generate the dynamic lambda. The helper ***BuildPropertyAccessExpression*** just builds the property access expression if its a first class property or dictionary. 
+In the above snippet, you can see that ***GenerateRuleCriteria*** is the main method that parses the configuration to generate the dynamic lambda. The helper ***BuildPropertyAccessExpression*** just builds the property access expression depending on, if its a first class property or dictionary key. All the run time data structure along with rules is passed back to the caller (RulesExecutor) in the ***Build*** method.
 
-- [Rule Executor](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Executor/RulesExecutor.cs) This class is the actual run time execution of rules. When ([Rules Context](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs)) is passed along, it gets the lambda match and executes the configured rules as shown below:
+- [Rule Executor](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Executor/RulesExecutor.cs) This class is the actual run time execution of rules. When ([Rules Context](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs)) is passed to it, it gets the lambda match and executes the configured rules as shown below:
 
 ~~~csharp
 public IEnumerable<Task<RuleResult>> Execute(RuleContext input)
-{s
+{
     IEnumerable<IRule<RuleContext,RuleResult>>? GetRulesToExecute(RuleContext input)
     {
         // Get Rules to execute
@@ -193,17 +190,19 @@ public IEnumerable<Task<RuleResult>> Execute(RuleContext input)
 }
 ~~~
 
-The rules that get executed are [Forward Rule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/ForwardRule.cs) or [Escalate Rule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/EscalateRule.cs) based on the configuration.
+The rules that get executed are [Forward Rule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/ForwardRule.cs) or [Escalate Rule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/EscalateRule.cs) based on the configuration setup.
 
-Following is the output showing those rules execution:
+Following are the results of those rules execution:
 
 ![image]({{site.url}}/images/classes-et-2.png)
 
-All of the source code is avaialable [here](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine) , if you want to explore this further. 
+I am sure this logic can be implemented in other different ways. Would like to hear if there are other suggestions!
+
+Anyways, All of the source code is available [here](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine), if you want to explore this further. 
 
 ***NOTE: BTW his code also leverages the custom function template that we discussed in one of the [previous post]({{site.url}}/Sync-over-Async-Function)***
 
-Enjoy!!!
+Cheers!!!
 
 
 

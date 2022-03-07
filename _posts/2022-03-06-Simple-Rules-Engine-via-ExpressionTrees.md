@@ -2,23 +2,28 @@
 layout:     post
 title:      Simple Rules engine via Expression Trees
 date:       2022-03-06
-summary:    This post explores a simple rules engine implementation leveraging Expression Trees in .NET.
+summary:    This post explores a simple rules engine implementation using Expression Trees in .NET.
 categories: .NET, ExpressionTrees, Meta Programming 
 ---
 
-In this post, we will explore how we leveraged [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/) and [Configuration](https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration) to create / execute simple rules engine component.
+In this post, we will explore how we leveraged [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/) and [.NET Configuration](https://docs.microsoft.com/en-us/dotnet/core/extensions/configuration) to create and execute simple rules engine component.
 
-We had a requirement, where our upstream components / services, could forward custom data points such as errors, custom dimensions, etc. to our rules / alarms component.... and based on configured criteria, we should be able to execute custom logic such as forwarding or escalating rules (more on that later). 
+We had a requirement, where our upstream components or services, would forward custom properties (errors, custom dimensions, etc.) to our rules / alarms component and based on some configured criteria, this component should be able to execute certain rules. 
 
-An interesting point about this setup was that the rules execution logic was simple but it had to be dynamically invoked based on certain configurable criteria since this could change in the upstream components and also it  should be easily deployable without modifying the source code.
+These rules were static and fairly simple (such as  forwarding / logging, escalation, etc.) but an interesting point about this setup was that it had to be dynamically invoked, since the upstream components could add, change or remove such properties.
+
+We wanted to design this in such a way that changes in the upstream components could easily be honored in the rules component with minimal changes (possibly without source code changes) and therefore making it easily deployable.
+
+Now, .NET provides us various dynamic programming options ([Reflection](https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/reflection), [CodeDOM](https://docs.microsoft.com/en-us/dotnet/framework/reflection-and-codedom/reflection), etc.) however for our use case, we needed something that was light weight and performant, hence we decided to go forward with [Expression Trees](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/expression-trees/). 
 
 
-Now, .NET provides us various metaprogramming options (Reflection, Code DOM, etc.) but for our use case, we needed something that was light weight and performant, hence we decided to go forward with Expression Trees. We also leveraged .NET configuration JSON structure to define our mini DSL for our rules execution logic. 
+***NOTE: Our use case for rules configuration was simple and we could add some validation around it as well. However such setup can get faily complex and therefore should be carefully adopted / evaluated on a case by case basis.***
 
-An [example]() of which is shown below:
+So lets see how we implemented such requirement. 
 
-***NOTE: Our use case for rules configuration was simple...depending on your use case, you can end up defining it accordingly so care must be taken to addd validation in place.The above configuration could really get complex so its important to keep a balance....***
+We first started with a custom .NET configuration JSON structure to define our mini DSL for our rules criteria and execution logic. 
 
+An [example](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) of which is shown below:
 
 ~~~JSON
 {
@@ -41,26 +46,20 @@ An [example]() of which is shown below:
 }
 ~~~
 
-The key elements in the above configuration are:
+In the above configuration, you can see that, ***Criteria:*** element is our mini DSL language which follows a convention of an object's ***Property1-Property2 condition Value1-Value2*** structure. These properties make up the [RuleContext](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs) object and our source generation logic (shown later), looks at this and parses it to dynamically generate the C# lambda code (a function in this case). 
 
-- Criteria: This element is our mini DSL language which follows a convention of an object's "Property1-Property2-Property3 <expression> Value1-Value2-Value3" format. The source generation logic, looks at this text and parses it to dynamically generate the C# code (a function in this case). 
+***NOTE: There are some first class properties defined in the RuleContext.....however there is also a dictionary property called Parameters, which is mainly used for extensibility, since the upstream components could easily add additional Key - value pairs to be considered for rules execution logic.*** 
 
-***NOTE: This is just an example of a simple implementation, this can be implemented in any structure you want which then affects your parsing logic.***
+Next is the  ***Rules*** element, which is mainly an array of all the rules that should be executed when that specific criteria is met.
 
-The object that defines these properties shown here[](). 
-
-***NOTE: There are some first class properties and also a dictionary (mainly used for extensibility) so that the upstream components could easily send additional Key / values to be considered for rules execution logic. 
-
--- Rules: This array element defines all the rules that should be executed when that specific criteria is met.  
-
-
-
-The below class diagram shows what are the different classes involved in constructing this component.
+The below diagram further shows what are the different classes involved in constructing and executing this logic.
 
 ![image]({{site.url}}/images/classes-et-1.png)
 
+The first is:
 
-- [RulesEngineService](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs) This is the entry function code that interacts with the Rules logic code. This logic is part of the function app which registers all the dependencies in the [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) as shown below:
+
+- [RulesEngineService](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs): This simple function acts as the client code and is part of the function app which also registers all the dependencies in its [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) class as shown below:
 
 ~~~csharp
 public override void Configure(IFunctionsHostBuilder builder)
@@ -96,7 +95,7 @@ public override void Configure(IFunctionsHostBuilder builder)
 
 }
 ~~~
-
+The above class, also passes the strongly typed [RulesContext]() object to the  
 - [RulesConfiguration](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RulesConfiguration.cs) This is the rules configuration object that's mapped from [appsettings.json](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) 
 
 

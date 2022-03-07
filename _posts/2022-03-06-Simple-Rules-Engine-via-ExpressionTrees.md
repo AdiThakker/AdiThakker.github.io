@@ -21,7 +21,7 @@ Now, .NET provides us various dynamic programming options ([Reflection](https://
 
 So lets see how we implemented such requirement. 
 
-We first started with a custom .NET configuration JSON structure to define our mini DSL for our rules criteria and execution logic. 
+We first started with a custom .NET configuration JSON structure to define Configurations list for our rules criteria and execution logic. 
 
 An [example](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) of which is shown below:
 
@@ -46,20 +46,43 @@ An [example](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main
 }
 ~~~
 
-In the above configuration, you can see that, ***Criteria:*** element is our mini DSL language which follows a convention of an object's ***Property1-Property2 condition Value1-Value2*** structure. These properties make up the [RuleContext](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs) object and our source generation logic (shown later), looks at this and parses it to dynamically generate the C# lambda code (a function in this case). 
+In the above configuration, you can see that, ***Criteria*** element is our mini DSL language for match and it follows a convention of an object's ***PropertyName condition Value*** structure. This setup can also accomodate ***Property1-Property2 condition Value1-Value2*** for multiple properties match. 
 
-***NOTE: There are some first class properties defined in the RuleContext.....however there is also a dictionary property called Parameters, which is mainly used for extensibility, since the upstream components could easily add additional Key - value pairs to be considered for rules execution logic.*** 
+The object that encapsulates these properties is [RuleContext](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs) and our source generation logic (shown later), looks at this and parses it to dynamically generate the C# lambda code (a function in this case). 
+
+***NOTE: If you look at the RuleContext object, there are some first class properties defined, however there is also a dictionary property called Parameters, which is mainly used for extensibility, allowing the upstream components to easily add additional Key - Value pairs to be included in the rules execution logic.*** 
 
 Next is the  ***Rules*** element, which is mainly an array of all the rules that should be executed when that specific criteria is met.
 
-The below diagram further shows what are the different classes involved in constructing and executing this logic.
+To elaborate the setup further, lets look at the diagram below which shows what are the different classes and their responsibilities.
+
 
 ![image]({{site.url}}/images/classes-et-1.png)
 
-The first is:
 
+- [Rules Engine Service Function](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs): This function is the client code and is the caller to the Rules engine logic.
 
-- [RulesEngineService](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/RulesEngineService.cs): This simple function acts as the client code and is part of the function app which also registers all the dependencies in its [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) class as shown below:
+~~~csharp
+[FunctionName("Dispatcher")]
+[OpenApiOperation(operationId: "Dispatcher", tags: new[] { "service" })]
+[OpenApiResponseWithBody(statusCode: HttpStatusCode.OK, contentType: "text/plain", bodyType: typeof(string), Description = "The OK response")]
+public async Task<IActionResult> Dispatcher(
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "{service}")] HttpRequest req, string service, ILogger log)
+{
+    log.LogInformation($"Received request for {service}");
+
+    var response = service switch
+    {
+        "AccountService" => rulesExecutor.Execute(new RuleContext() { Source = "Account" }).Aggregate(new StringBuilder(), (results, result) => results.AppendLine(result.Result.Status)).ToString(),
+        "OrderService" => rulesExecutor.Execute(new RuleContext() { Source = "Order", Parameters = new Dictionary<string, string> { { "Error", "QuantityError" } } }).Aggregate(new StringBuilder(), (results, result) => results.AppendLine(result.Result.Status)).ToString(),
+        _ => "Invalid request"
+    };
+
+    return new OkObjectResult(response);
+}
+~~~
+
+DI is leveraged in [Startup](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/Startup.cs) as shown below:
 
 ~~~csharp
 public override void Configure(IFunctionsHostBuilder builder)
@@ -95,13 +118,13 @@ public override void Configure(IFunctionsHostBuilder builder)
 
 }
 ~~~
-The above class, also passes the strongly typed [RulesContext]() object to the  
-- [RulesConfiguration](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RulesConfiguration.cs) This is the rules configuration object that's mapped from [appsettings.json](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) 
+
+All the data points  / properties are wrapped in [Rules Context](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs) object and is pased along downstream.
 
 
-- [RulesBuilder](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Builder/RulesBuilder.cs) This class, as the name indicates is mainly responsible for building the execution runtime by looking at rules configuration
+- [Rules Builder](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Builder/RulesBuilder.cs) This class, as the name indicates is mainly responsible for building the execution runtime by looking at [RulesConfiguration](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RulesConfiguration.cs) object that's mapped from [appsettings.json](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Adi.FunctionApp.RulesEngine.Service/appsettings.json) 
 
-Key methods include:
+The main logic for constructing all of this is shown below:
 
 ~~~csharp
 public IDictionary<Func<RuleContext, bool>, (bool, IEnumerable<IRule<RuleContext, RuleResult>>)> Build()
@@ -142,11 +165,13 @@ private Func<RuleContext, bool> GenerateRuleCriteria(string criteria)
 }
 ~~~
 
-- [RuleExecutor](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Executor/RulesExecutor.cs) This class is the actual run time execution of rules. The method that has that logic is shown below:
+In the above snippet, you can see that ***GenerateRuleCriteria*** is the main method that parses the configuration to generate the dynamic lambda. The helper ***BuildPropertyAccessExpression*** just builds the property access expression if its a first class property or dictionary. 
+
+- [Rule Executor](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Executor/RulesExecutor.cs) This class is the actual run time execution of rules. When ([Rules Context](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Models/RuleContext.cs)) is passed along, it gets the lambda match and executes the configured rules as shown below:
 
 ~~~csharp
 public IEnumerable<Task<RuleResult>> Execute(RuleContext input)
-{
+{s
     IEnumerable<IRule<RuleContext,RuleResult>>? GetRulesToExecute(RuleContext input)
     {
         // Get Rules to execute
@@ -168,16 +193,22 @@ public IEnumerable<Task<RuleResult>> Execute(RuleContext input)
 }
 ~~~
 
-- [ForwardRule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/ForwardRule.cs), [EscalateRule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/EscalateRule.cs) are the actual rules that get executed when the criteria matches.
+The rules that get executed are [Forward Rule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/ForwardRule.cs) or [Escalate Rule](https://github.com/AdiThakker/Adi.FunctionApp.RulesEngine/blob/main/Source/Shared/Adi.FunctionApp.RulesEngine.Domain/Rules/EscalateRule.cs) based on the configuration.
 
-As you can see in the following output, correct rule being executed when criteria is met.
+Following is the output showing those rules execution:
 
 ![image]({{site.url}}/images/classes-et-1.png)
 
-All ths source code is avaialable [here]() and it leverages the custom template that we discussed in the [previous post]()
+I have made all of this avaialable [here](). If you want to explore this further. 
+
+***NOTE: This code also leverages the custom function template that we discussed in one of the [previous post]()
+
+Enjoy!!!
 
 
-Let me know what your thoughts are!!! 
+
+
+
 
 
 

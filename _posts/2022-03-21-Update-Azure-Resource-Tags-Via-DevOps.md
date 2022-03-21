@@ -52,8 +52,12 @@ Running the above pipeline and looking at the artifacts generated we can verify 
 
 Alright, so with this in place, next step was to update the deployment pipline to get these tags and create / append to the Azure Function deployment. This is where [Azure Powershell](https://docs.microsoft.com/en-us/azure/devops/pipelines/tasks/deploy/azure-powershell?msclkid=f88d6795a95711eca5a21efc64e87c28&view=azure-devops) task comes in.
 
+The following is a snap shot of showing 2 tasks:
 
-![image]({{site.url}}/images/classes-et-1.png)
+![image]({{site.url}}/images/powershell-5.png)
+
+
+![image]({{site.url}}/images/powershell-6.png)
 
 ~~~PowerShell
 # Get Metadata tags from file
@@ -83,9 +87,9 @@ Set-AzResource -ResourceGroupName $(resourceGroupName) -ResourceName $(resourceN
 
 The above does this...
 
-Like the eralier one, we also exported this as a Task Group and parameterized the varaibles. So this could be imported in several of our CD pipelines.
+Finally running the deployment pipeline, updates the Function deployment with the correct tags:
 
-Finally running the pipelines
+![image]({{site.url}}/images/powershell-7.png)
 
 
 

@@ -6,21 +6,18 @@ summary:    This post explores how to automate Azure DevOps pipelines via its AP
 categories: Azure DevOps, .NET, PowerShell
 ---
 
-If you have read the [last]({{site.url}}/Update-Azure-Resource-Tags-Via-DevOps) post, you saw that we built custom [Task Group](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?msclkid=70d17771a95611ec986e92ff7f24881f&view=azure-devops) for creating reusable tasks. This was a good start since these could be imported into our CI/CD pipelines. 
+In the [last]({{site.url}}/Update-Azure-Resource-Tags-Via-DevOps) post, you saw that we built custom [Task Group](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?msclkid=70d17771a95611ec986e92ff7f24881f&view=azure-devops) for creating reusable tasks. This gave us the ability to import them into our CI/CD pipelines. 
 
 However, we soon realized that manually updating several of our CI / CD pipelines was very tedious task 😉 itself. 
 
-So, the thought was hey, can we automate this? And a quick research resulted in couple options:
+So, the thought was hey, can we automate this? And a quick research resulted in following options:
 
 - [.NET Client Libraries](https://docs.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops) available via NuGet to script Azure DevOps automation.
 
 - [VSTeam Powershell](https://github.com/MethodsAndPractices/vsteam) modules that let you integrate with Azure DevOps.
 
 
-***NOTE: This blog post explores the first option. We'll try and explore VSTeam Powershell in another one. BTW, there is also the [REST](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops) API available, which we are not going to cover.***
-
-
-The ***simplified and exploratory*** version of this code is available [here](https://github.com/AdiThakker/AzureDevOps.Integration) and is heavily influenced by this [reference](https://github.com/microsoft/azure-devops-dotnet-samples), so with that in place, lets dive in.
+***NOTE: This blog post explores the first option. There is also the [REST](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops) API available, which we are not going to cover. Also, the _simplified and exploratory_ version of this code is uploaded [here](https://github.com/AdiThakker/AzureDevOps.Integration) and is heavily influenced by this [reference](https://github.com/microsoft/azure-devops-dotnet-samples), so with that in place, lets dive in.***
 
 Reading through the docs tells us that we first need the following NuGet libraries to get started:
 
@@ -69,6 +66,9 @@ Console.ReadKey();
 
 In the above code, we first connect to Azure DevOps and retrieve the configured Repository, after which we update the build and release definitions. The fluent syntax method calls are enabled via [DevOpsExtensions](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/DevOpsExtensions.cs) class and following are some of its relevant snippets:
 
+
+ ### Connecting to Azure DevOps
+
 ~~~csharp
 public static DevOpsContext ConnectToAzureDevOps(this IConfigurationRoot configuration)
 {
@@ -86,6 +86,8 @@ There are [several](https://docs.microsoft.com/en-us/azure/devops/integrate/rest
 
 For our use case, we are leveraging [PAT](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=Windows) via ***VssConnection*** wrapped in our custom [DevOpsContext](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/Models/DevOpsContext.cs) object.
 
+### Retrieving Repository
+
 Once we have the connection set, we get the configured repository via [GitHttpClient](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.sourcecontrol.webapi.githttpclient?view=azure-devops-dotnet) instance. 
 
 ~~~csharp
@@ -102,6 +104,7 @@ public static DevOpsContext GetConfiguredRepository(this DevOpsContext context)
 
 ***NOTE: The .Net Client Libraries API use specific typed HTTP clients for accessing relevant aspects of Azure DevOps. This will be apparent in the various snippets through this post.***
 
+### Updating the Build Definition
 
 The next step is to retrieve and update the [BuildDefinition](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.builddefinition?view=azure-devops-dotnet) with the relevant build Task from our Task group as shown below:
 
@@ -178,6 +181,8 @@ We then use [BuildHttpClient](https://docs.microsoft.com/en-us/dotnet/api/micros
 Following is the snapshot of the build after the update:
 
 ![image]({{site.url}}/images/devops-1.png)
+
+### Updating the Release Definition
 
 Updating the release definition follows a similar approach.
 

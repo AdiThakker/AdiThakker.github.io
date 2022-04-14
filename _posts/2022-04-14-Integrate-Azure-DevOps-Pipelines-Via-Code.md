@@ -17,7 +17,7 @@ So, the thought was hey, can we automate this? And a quick research resulted in 
 - [VSTeam Powershell](https://github.com/MethodsAndPractices/vsteam) modules that let you integrate with Azure DevOps.
 
 
-***NOTE: This blog post explores the first option. There is also the [REST](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops) API available, which we are not going to cover. Also, the _simplified and exploratory_ version of this code is uploaded [here](https://github.com/AdiThakker/AzureDevOps.Integration) and is heavily influenced by this [reference](https://github.com/microsoft/azure-devops-dotnet-samples), so with that in place, lets dive in.***
+***NOTE: This blog post explores the first option. There is also the [REST](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops) API available, which we are not going to cover. Also, the __simplified and exploratory__ version of this code is uploaded [here](https://github.com/AdiThakker/AzureDevOps.Integration) and is heavily influenced by this [reference](https://github.com/microsoft/azure-devops-dotnet-samples), so with that in place, lets dive in.***
 
 Reading through the docs tells us that we first need the following NuGet libraries to get started:
 
@@ -265,9 +265,9 @@ Finally updating the CD Pipeline with the release definition results in the foll
 
 ![image]({{site.url}}/images/devops-2.png)
 
-So there you see folks, the above coding exercise was very exploratory in nature and documentation is very lean around it (except the reference included earlier). 
+So there you see folks, the above coding exercise is still very exploratory in nature and documentation is very lean around it. 
 
-BTW, this post just scratches the surface of Azure DevOps integration relevant to importing Task groups in CI/CD pipelines and needs to be hardened which I'll continue doing on my end. Meanwhile in the next post we will try to explore the PowerShell module around this as well. 
+BTW, this post just scratches the surface of Azure DevOps integration and definitely needs to be hardened which I'll continue doing on my end. Meanwhile in the next post we will try to explore the PowerShell module around this as well. 
 
 So, see you then!!! 
 

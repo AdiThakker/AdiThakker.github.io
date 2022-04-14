@@ -6,23 +6,23 @@ summary:    This post explores how to automate Azure DevOps pipelines via its AP
 categories: Azure DevOps, .NET, PowerShell
 ---
 
-If you have read the [last]({{site.url}}/Update-Azure-Resource-Tags-Via-DevOps) post, you saw that we built custom [Task Group](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?msclkid=70d17771a95611ec986e92ff7f24881f&view=azure-devops) for creating reusable tasks. This was a good start since these tasks could be imported into our CI/CD pipelines. However we soon realized that manually updating several of our CI / CD pipelines was very tedious task 😉. 
+If you have read the [last]({{site.url}}/Update-Azure-Resource-Tags-Via-DevOps) post, you saw that we built custom [Task Group](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/task-groups?msclkid=70d17771a95611ec986e92ff7f24881f&view=azure-devops) for creating reusable tasks. This was a good start since these could be imported into our CI/CD pipelines. 
 
-So, the thought was hey, can we automate this? 
+However, we soon realized that manually updating several of our CI / CD pipelines was very tedious task 😉 itself. 
 
-And a quick research resulted in couple options:
+So, the thought was hey, can we automate this? And a quick research resulted in couple options:
 
 - [.NET Client Libraries](https://docs.microsoft.com/en-us/azure/devops/integrate/concepts/dotnet-client-libraries?view=azure-devops) available via NuGet to script Azure DevOps automation.
 
 - [VSTeam Powershell](https://github.com/MethodsAndPractices/vsteam) modules that let you integrate with Azure DevOps.
 
 
-***NOTE: This blog post explores the first option. We'll try and explore VS Team Powershell in another one. BTW, there is also the REST api option as well. You can refer that [here](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops).***
+***NOTE: This blog post explores the first option. We'll try and explore VSTeam Powershell in another one. BTW, there is also the [REST](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops) API available, which we are not going to cover.***
 
 
 The ***simplified and exploratory*** version of this code is available [here](https://github.com/AdiThakker/AzureDevOps.Integration) and is heavily influenced by this [reference](https://github.com/microsoft/azure-devops-dotnet-samples), so with that in place, lets dive in.
 
-Alright, reading through the docs tells us that we need the following NuGet libraries to get started:
+Reading through the docs tells us that we first need the following NuGet libraries to get started:
 
 ~~~xml
 <PackageReference Include="Microsoft.TeamFoundation.DistributedTask.Common.Contracts" Version="16.170.0" />
@@ -67,7 +67,7 @@ Console.WriteLine("Definitions Updated!");
 Console.ReadKey();
 ~~~
 
-We first connect to Azure DevOps and retrieve the configured Repository after which we update the build and release definitions. The fluent syntax method calls are enabled via [DevOpsExtensions](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/DevOpsExtensions.cs) class (relevant snipptes) are shown below:
+In the above code, we first connect to Azure DevOps and retrieve the configured Repository, after which we update the build and release definitions. The fluent syntax method calls are enabled via [DevOpsExtensions](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/DevOpsExtensions.cs) class and following are some of its relevant snippets:
 
 ~~~csharp
 public static DevOpsContext ConnectToAzureDevOps(this IConfigurationRoot configuration)
@@ -82,7 +82,9 @@ public static DevOpsContext ConnectToAzureDevOps(this IConfigurationRoot configu
 }
 ~~~
 
-There are [several](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops#create-the-request) ways to Authenticate with Azure DevOps and depending on your use case, you can use the appropriate one accordingly. In the above snippet, we are leveraging [PAT](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=Windows) for our example. In the ***ConnectToAzureDevOps*** function we wrap the instance of [VssConnection](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2013/dn245455(v=vs.120) and return that in our custom [DevOpsContext](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/Models/DevOpsContext.cs) object.
+There are [several](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops#create-the-request) ways to Authenticate with Azure DevOps and depending on your use case, you can use the appropriate one. 
+
+For our use case, we are leveraging [PAT](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/use-personal-access-tokens-to-authenticate?view=azure-devops&tabs=Windows) via ***VssConnection*** wrapped in our custom [DevOpsContext](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/Models/DevOpsContext.cs) object.
 
 Once we have the connection set, we get the configured repository via [GitHttpClient](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.sourcecontrol.webapi.githttpclient?view=azure-devops-dotnet) instance. 
 
@@ -98,9 +100,10 @@ public static DevOpsContext GetConfiguredRepository(this DevOpsContext context)
 }
 ~~~
 
-***NOTE: The .Net Client Libraries API use specific typed clients for accessing relevant aspects of Azure DevOps. This will be apparent in the snippets through this post.***
+***NOTE: The .Net Client Libraries API use specific typed HTTP clients for accessing relevant aspects of Azure DevOps. This will be apparent in the various snippets through this post.***
 
-The next step is to retrieve and update the build definition with the relevant build Task from our Task group as shown below:
+
+The next step is to retrieve and update the [BuildDefinition](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.builddefinition?view=azure-devops-dotnet) with the relevant build Task from our Task group as shown below:
 
 ~~~csharp
 public static DevOpsContext GetLatestBuildDefinition(this DevOpsContext context)
@@ -123,7 +126,7 @@ public static BuildDefinition UpdateLatestBuildDefinitionsWithTagTask(this DevOp
     var taskClient = context.Connection.GetClient<TaskAgentHttpClient>();
     var taskGroups = taskClient.GetTaskGroupsAsync(project).Result;
 
-    // Get tag Group
+    // Get tag task from task group
     var taskGroup = taskGroups.First(group => group.Name == "Export-MetaTags");
     var tagTask = taskGroup.Tasks.First();
 
@@ -166,12 +169,11 @@ public static BuildDefinition UpdateLatestBuildDefinitionsWithTagTask(this DevOp
     }
 }
 ~~~
+In the above code, the intersting stuff is in the ***UpdateLatestBuildDefinitionsWithTagTask*** function, where you can see that our Build Task is retrieved from Task Groups via [TaskAgentHttpClient](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.distributedtask.webapi.taskagenthttpclient?view=azure-devops-dotnet).
 
-In the ***UpdateLatestBuildDefinitionsWithTagTask*** function you can see that Task Groups are accessed via [TaskAgentHttpClient](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.distributedtask.webapi.taskagenthttpclient?view=azure-devops-dotnet) class and we filter them find the relevant build task. 
+Then we create [BuildDefinitionStep](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.builddefinitionstep?view=azure-devops-dotnet) and set its inputs from our [TaskGroup](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.distributedtask.webapi.taskgroup?view=azure-devops-dotnet) instance. 
 
-Then we create [BuildDefinitionStep](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.builddefinitionstep?view=azure-devops-dotnet) instance and set its inputs from our [TaskGroup](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.distributedtask.webapi.taskgroup?view=azure-devops-dotnet) instance. 
-
-We then use [BuildHttpClient](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.buildhttpclient?view=azure-devops-dotnet) to update our build definition. 
+We then use [BuildHttpClient](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.buildhttpclient?view=azure-devops-dotnet) to update our [BuildDefinition](https://docs.microsoft.com/en-us/dotnet/api/microsoft.teamfoundation.build.webapi.builddefinition?view=azure-devops-dotnet). 
 
 Following is the snapshot of the build after the update:
 
@@ -179,9 +181,9 @@ Following is the snapshot of the build after the update:
 
 Updating the release definition follows a similar approach.
 
-We use [ReleaseHttpClient]() class to retrieve and update the release definition by environment. 
+We use ***ReleaseHttpClient*** class to retrieve and update the [ReleaseDefinition](https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/releasedefinition) by its [Environments](https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/releasedefinitionenvironment) property. 
 
-Few differences to note are that we need to access []() an instance of []() is added to the [DeployPhase]() instance of the appropriate [Environment]()  
+Each [DeployPhase](https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/deployphase) has a collection [WorkflowTask](https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/workflowtask) which is where we append our tag task and finally update the [ReleaseDefinition](https://docs.microsoft.com/en-us/javascript/api/azure-devops-extension-api/releasedefinition). All of this is shown below:
 
 ~~~csharp
 public static DevOpsContext GetLatestReleaseDefinition(this DevOpsContext context)
@@ -254,13 +256,15 @@ public static ReleaseDefinition UpdateLatestReleaseDefinitionsWithTagTask(this D
 }
 ~~~
 
-- snapshot
+Finally updating the CD Pipeline with the release definition results in the following:
 
+![image]({{site.url}}/images/devops-2.png)
 
+So there you see folks, the above coding exercise was very exploratory in nature and documentation is very lean around it (except the reference included earlier). 
 
-The above exercise was very exploratory in nature and i could not find any good documentation arond it (except the reference included earlier). This post just scratches the surface of Azure DevOps integration relvant to my use case and needs to be hardened which i'll continue doing on my end. Meanwhile in the next post we will try to explore the PowerShell module around this. 
+BTW, this post just scratches the surface of Azure DevOps integration relevant to importing Task groups in CI/CD pipelines and needs to be hardened which I'll continue doing on my end. Meanwhile in the next post we will try to explore the PowerShell module around this as well. 
 
-So see you then!!! 
+So, see you then!!! 
 
 
 

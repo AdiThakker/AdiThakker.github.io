@@ -31,10 +31,18 @@ I have shown the script below with comments included to explain steps:
 ***NOTE:  i heavily leveraged [source](https://github.com/MethodsAndPractices/vsteam/tree/trunk/Source/Public) to find the cmdlets and experimented to get the below script working: 
 
 ~~~PowerShell
-# Get the Build definition by Id
-$buildDefinition = Get-VSTeamBuildDefinition -Id 4 -Json
-write-output $buildDefinition.process
 
+# Get the CI Build Definition
+$buildDefinition = Get-VSTeamBuildDefinition -Id 4
+
+# Get the Build Task Group
+$buildTask = Get-VSTeamTaskGroup -Name "Update Tags"
+
+# Import Build Task into the Build Definition and update it
+$steps = $buildDefinition.process.phases[0].steps
+#$steps.Add($buildTask)
+
+write-output $steps
 
 ~~~
 

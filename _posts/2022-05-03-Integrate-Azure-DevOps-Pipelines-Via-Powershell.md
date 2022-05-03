@@ -30,7 +30,7 @@ I have shown the script below with comments included to explain steps:
 
 ***NOTE:  i heavily leveraged [source](https://github.com/MethodsAndPractices/vsteam/tree/trunk/Source/Public) to find the cmdlets and experimented to get the below script working: 
 
-~~~PowerShell
+~~~powershell
 
 # Get the CI Build Definition
 $buildDefinition = Get-VSTeamBuildDefinition -Id 4
@@ -40,9 +40,17 @@ $buildTask = Get-VSTeamTaskGroup -Name "Update Tags"
 
 # Import Build Task into the Build Definition and update it
 $steps = $buildDefinition.process.phases[0].steps
-#$steps.Add($buildTask)
 
-write-output $steps
+# Add new Task
+$newTasks = @{}
+$iteration = 1
+foreach($step in $steps)
+{
+	$newTasks.Add($step.Name, $step)
+}
+$newTasks.Add($buildTask.name, $buildTask)
+
+write-output $newTasks
 
 ~~~
 

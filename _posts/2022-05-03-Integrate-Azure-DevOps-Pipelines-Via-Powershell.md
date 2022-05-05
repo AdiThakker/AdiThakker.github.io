@@ -46,11 +46,16 @@ $newTasks = @{}
 $iteration = 1
 foreach($step in $steps)
 {
-	$newTasks.Add($step.Name, $step)
+	$newTasks.Add($step.displayName, $step)
 }
 $newTasks.Add($buildTask.name, $buildTask)
 
-write-output $newTasks
+# update Definitions Tasks
+$buildDefinition.process.phases[0].steps = $newTasks
+
+# Update Definition
+$buildJson = $buildDefinition | ConvertTo-Json -Depth 100
+Update-VSTeamBuildDefinition -ProjectName AzureFunctionDeployment -Id 4 -BuildDefinition $buildJson
 
 ~~~
 

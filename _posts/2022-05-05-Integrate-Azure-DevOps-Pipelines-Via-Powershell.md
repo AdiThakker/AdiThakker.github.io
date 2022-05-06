@@ -1,8 +1,8 @@
 ---
 layout:     post
 title:      Integrate Azure DevOps Pipelines via Powershell
-date:       2022-05-03
-summary:    This post explores how to automate Azure DevOps pipelines via its Powershell module
+date:       2022-05-05
+summary:    This post explores how to automate Azure DevOps pipelines via Powershell module
 categories: Azure DevOps, Powershell
 ---
 
@@ -26,30 +26,31 @@ Now, I was ready to script this automation, which I have shown below with commen
 
 ***NOTE:  i heavily leveraged [source](https://github.com/MethodsAndPractices/vsteam/tree/trunk/Source/Public) and this [issue](https://github.com/MethodsAndPractices/vsteam/issues/339) to find the cmdlets and experimented to get the below script working:*** 
 
-***Also this script is bare minimum and does not perform any validation checks, which you might have to implement on your end*** 
-
 ~~~powershell
 
 # Get the CI Build Definition
-$buildDefinition = Get-VSTeamBuildDefinition -Id 4   -Raw # Use the Id here since its the only Build in the project
-
-# Get the Build Task Group by its name 
-$buildTask = Get-VSTeamTaskGroup -Name "Update Tags"
+$buildDefinition = Get-VSTeamBuildDefinition -Id 4   -Raw  # Use the Id here since its the only Build in the project
 
 # retrieve the steps of the build
 $steps = $buildDefinition.process.phases[0].steps
 
-# define task to import
-$metaTagsTask = [PSCustomObject]@{
-    displayName = $buildTask.Name
-    task = $buildTask.tasks[0].task
-	inputs = $buildTask.tasks[0].inputs
-	id = $buildTask.tasks[0].task.id
-    enabled    = "True"
+# Get the Build Task Group by its name 
+$taskGroup = Get-VSTeamTaskGroup -Name "Export-MetaTags"
+
+# define definition step
+$definitionStep = [PSCustomObject]@{
+	displayName = $taskGroup.name
+	enabled = "True"
+	task = [PSCustomObject]@{
+		id = $taskGroup.id
+		versionSpec = $taskGroup.version
+		definitionType = "metaTask"
+	}
+	inputs = $taskGroup.inputs	
 }
 
 # update Definitions Tasks
-$buildDefinition.process.phases[0].steps = $steps + $metaTagsTask
+$buildDefinition.process.phases[0].steps = $steps + $definitionStep
 
 # add Comment
 Add-Member -InputObject $buildDefinition -NotePropertyName "comment" -NotePropertyValue "Imported Update Tags" -Force
@@ -60,8 +61,10 @@ Update-VSTeamBuildDefinition -ProjectName AzureFunctionDeployment -Id 4 -BuildDe
 
 ~~~
 
+***The above script is bare minimum and does not perform any validation checks, which you might have to implement on your end*** 
+
 So there you see folks... depending on your preference, you can leverage this option as well. For my use case we ended up leveraging the .NET Client libraries
 
-***NOTE: I'll leave the updating of CD pipeline as an  exercise for you to explore 😉 and keep this post short.***
+***BTW: I'll leave the updating of CD pipeline as an  exercise for you to explore 😉 and keep this post short.***
 
 

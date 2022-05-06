@@ -12,7 +12,7 @@ You must have noticed, that I mentioned another alternative [VSTeam Powershell](
 
 If you read through the VSTeam's link, the first thing we have to do is download that module. So lets get started...
 
-Firing up pwershell, I first updated it to the latest version and then installed the module as shown below:
+Firing up powershell, I noticed old version... so I first updated it to the latest version and then installed the module as shown below:
 
 ![image]({{site.url}}/images/devops-ps-1.png)
 
@@ -49,6 +49,12 @@ $definitionStep = [PSCustomObject]@{
 	inputs = $taskGroup.inputs	
 }
 
+# supply value to the definitionStep param
+$inputValue = @{}
+$inputValue.Add("csprojfile", "<path to csproj>")
+
+$definitionStep.inputs = $inputValue
+
 # update Definitions Tasks
 $buildDefinition.process.phases[0].steps = $steps + $definitionStep
 
@@ -62,6 +68,10 @@ Update-VSTeamBuildDefinition -ProjectName AzureFunctionDeployment -Id 4 -BuildDe
 ~~~
 
 ***The above script is bare minimum and does not perform any validation checks, which you might have to implement on your end*** 
+
+Following is the updated build pipeline after executing the above script
+
+![image]({{site.url}}/images/devops-ps-4.png)
 
 So there you see folks... depending on your preference, you can leverage this option as well. For my use case we ended up leveraging the .NET Client libraries
 

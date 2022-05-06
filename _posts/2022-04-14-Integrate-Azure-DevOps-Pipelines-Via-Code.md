@@ -70,7 +70,8 @@ Console.ReadKey();
 In the above code, we first connect to Azure DevOps and retrieve the configured repository, after which we update the build and release definitions. The fluent syntax is enabled via [DevOpsExtensions](https://github.com/AdiThakker/AzureDevOps.Integration/blob/main/AzureDevOps.Integration/DevOpsExtensions.cs) class and following are some of its relevant snippets.
 
 
- ### Connecting to Azure DevOps
+### Connecting to Azure DevOps
+
 
  There are [several](https://docs.microsoft.com/en-us/azure/devops/integrate/rest-api-overview?view=azure-devops#create-the-request) ways to Authenticate with Azure DevOps and depending on your use case, you can use the appropriate one. 
  

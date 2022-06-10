@@ -14,7 +14,7 @@ The use case was something like the this:
 
 I think the following sequence diagram would help explain this further:
 
-![image]({{site.url}}/images/Durable-Functions-2.png)
+![image]({{site.url}}/images/Durable-functions-2.png)
 
 In the above diagram, when ***Event X (primary event)*** is received on a topic, the Event Aggregator step starts a ***threshold timer (24 hours)*** in this case and then simultaneously waits for all of its dependencies to arrive (on different topics). 
 
@@ -192,13 +192,13 @@ public void PublishStatus([ActivityTrigger] string status)
 ~~~
 Running the workflow for both use cases (timeout and all dependencies received) is shown below:
 
-![image]({{site.url}}/images/Durable-Functions-3.png)
+![image]({{site.url}}/images/Durable-functions-3.png)
 
-![image]({{site.url}}/images/Durable-Functions-4.png)
+![image]({{site.url}}/images/Durable-functions-4.png)
 
-![image]({{site.url}}/images/Durable-Functions-5.png)
+![image]({{site.url}}/images/Durable-functions-5.png)
 
-![image]({{site.url}}/images/Durable-Functions-6.png)
+![image]({{site.url}}/images/Durable-functions-6.png)
 
 So, there you see folks! Implementing this durable workflow was very convenient, It takes a little used to adhering to [Orchestration code constraints](https://docs.microsoft.com/en-us/azure/azure-functions/durable/durable-functions-code-constraints) but I guess with more practice, you get used to it. 
 

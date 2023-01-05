@@ -1,8 +1,8 @@
 ---
 layout:     post
-title:      Feature Flags in .NET - Leveraging Conditional Feature Flags (Post 1)
+title:      Feature Flags in .NET - Conditional Feature Flags (Post 1)
 date:       2022-09-16
-summary:    In this first part of series, we will explore how to leverage conditional Feature Flags for executing any custom logic in your .NET code
+summary:    In this first part of series, we will explore how to implement conditional Feature Flags for executing any custom logic in your .NET code
 categories: .NET, Azure, Feature-Flags
 ---
 
@@ -20,7 +20,9 @@ Such functionality can be very handy as you can control aspects such as:
 
 - Testing in production with only limited users. (sometimes a slippery slope 😉).
 
-In the project that I was involved in recently... we had a requirement, where we had to enable ***Verbose Logging Feature*** once the application was deployed and automatically disable that feature after certain configured ***Time-Window*** had passed (say 24 hours). So this led me to explore [Feature Management API](https://github.com/microsoft/FeatureManagement-Dotnet) in .NET and this post talks about one way to implement that.
+In the project that I was involved in recently... there was a requirement, where we had to enable ***Verbose Logging***, after the application was deployed and then automatically disable that after certain configured ***Time-Window*** had passed (say 24 hours). So this led me to explore the Feature Flags path and thereby the [Feature Management API](https://github.com/microsoft/FeatureManagement-Dotnet) in .NET.
+
+This post primarily talks about one way to implement that.
 
 
 ## .NET API ##
@@ -29,15 +31,15 @@ In the project that I was involved in recently... we had a requirement, where we
 
 The important [constucts](https://docs.microsoft.com/en-us/azure/azure-app-configuration/concept-feature-management#basic-concepts) for Feature Management include:
 
-- ***Feature Flag Definition:*** This is the repository where feature flags are configured. It Includes several stores and ***IConfiguration*** providers  ***but not all support change notifications***. For my use case I leveraged standard appsettings.json and/or [Azure App Configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/overview).
+- ***Feature Flag Definition:*** This is how feature flags are configured. It Includes several stores and ***IConfiguration*** providers  ***but not all support change notifications***. For my use case I leveraged standard appsettings.json and/or [Azure App Configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/overview).
 
 - ***Feature Manager:*** Logic for handling life cycle of all feature flags (esp. notifications when values change).
 
 - ***Feature Filter:*** Definition / Rule when the Feature Flag should be enabled / disabled.  Some Feature Flags are binary on/off but some depend on additional rules / filters which are used to turn them on/off.
 
-There are already a [few]() pre-existing filters provided by the library and for my use case, I leveraged [Time Window](). ***NOTE: In the next post we will see how we can implement our own custom filter.***
+Now, there are already a [few](https://learn.microsoft.com/en-us/dotnet/api/microsoft.featuremanagement.ifeaturefilter?view=azure-dotnet-preview) pre-existing filters provided by the library and for my use case, [Time Window](https://learn.microsoft.com/en-us/dotnet/api/microsoft.featuremanagement.featurefilters.timewindowfilter?view=azure-dotnet-preview) fitted perfectly well. ***NOTE: In the next post we will see how we can implement our own custom filter.***
 
-So lets get started with it.
+So with that in place, lets look at the sample implementation.
 
 
 ## Implementation ##
@@ -46,7 +48,7 @@ The source code of this is available [here](https://github.com/AdiThakker/Featur
 
 ### Feature Definition ###
 
-Starting with the definition, The Time Window definition in the appsettings.json is straight out of [docs](). The only point to notice is that the {StartDate} and {EndDate} tokens are the dynamic values which get set in the CD pipeline task.
+Starting with the definition, The Time Window definition in the appsettings.json is straight out of [docs](). The only point to notice is that the {StartDate} and {EndDate} tokens are the dynamic values which get set in the CD pipeline (any token replacement) task.
 
 ~~~json
 {
@@ -69,13 +71,11 @@ Starting with the definition, The Time Window definition in the appsettings.json
 
 ### Feature Evaluation ###
 
-I have created some wrappers around the buitl-in API to provide some additional overloads and to enable Feature Flag definition on a class, or a method level. 
-
-Classes which encapsulate logic for FeatureFlag evaluation. Starting with: 
+To assist with Feature evaluation, I have created some wrappers around the built-in API. These  classes mainly provide some additional overloads and ability to enable/disable Feature Flag definition on a ***class***, or a ***method***. 
 
 #### FeatureDefinitionAttribute ####
 
-This is a standard [Attribute]() implementation to decorate class or method. The idea behind this is to allow for Feature Flag definition and exeuction at either a class or a method level.  
+This is a custom [Attribute](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/attributes/creating-custom-attributes) implementation to decorate class or method. ***The idea behind this is to allow for Feature Flag definition and exeuction at either a class or a method level.***  
 
 ~~~csharp
 

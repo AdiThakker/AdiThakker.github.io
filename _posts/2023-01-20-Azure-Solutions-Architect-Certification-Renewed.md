@@ -6,12 +6,12 @@ summary:    Renewed Azure Solutions Architect certification for one more year.
 categories: Certifications, Azure
 ---
 
-It's that time of the year again and i have just renewed my Azure Solutions Architect certification.
+It's that time of the year again and this week I was able to renew my Azure Solutions Architect certification.
+
 
 ![Setup]({{site.url}}/images/cert-renewal-arch.png){:height="500px" width="700px"}
 
 
-View my badge [here]()
-
-In the next post we will continue with Feature Flags implementation!
+View my badge [here](https://www.credly.com/badges/7a901934-bfbe-431d-80fd-2c87ef9d7671/public_url)
+ 
 

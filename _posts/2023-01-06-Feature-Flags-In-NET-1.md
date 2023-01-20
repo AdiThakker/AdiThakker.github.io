@@ -29,7 +29,7 @@ This post primarily talks about an implementation of that.
 
 .NET has extensive Feature Management API which is enabled via [Microsoft.FeatureManagement](https://docs.microsoft.com/en-us/dotnet/api/microsoft.featuremanagement?view=azure-dotnet-preview) namespace.
 
-The important [constucts](https://docs.microsoft.com/en-us/azure/azure-app-configuration/concept-feature-management#basic-concepts) for Feature Management include:
+The important [constructs](https://docs.microsoft.com/en-us/azure/azure-app-configuration/concept-feature-management#basic-concepts) for Feature Management include:
 
 - ***Feature Flag Definition:*** This is how feature flags are configured. It Includes several stores and ***IConfiguration*** providers  ***but not all support change notifications***. For my use case I leveraged standard appsettings.json and [Azure App Configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/overview) 
   

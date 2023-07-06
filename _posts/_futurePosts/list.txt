@@ -9,5 +9,6 @@
 - Bicep IaC, KeyVaults, App Config, API Management
 - SignalR serverless, React
 - Patterns
+- ROP
 
 - using Zoom it as a productivity tool

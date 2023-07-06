@@ -1,13 +1,13 @@
-- Sync over async (TCS)
-- Sync over async (Durable Functions)
 - Functions custom binding / late binding
-- .NET custom templates
 - .NET Source Generators
 - Durable Functions 
 - Durable Functions Actor
 - Service Bus scheduled enqueue message (DElayed REtries model)
-- Feature flags
-- Roslyn Analyzers (around usage FEature Flags)
+- Roslyn Analyzers 
 - Resiliency in Apps using Polly (Retries, Circuit Breaker)
 - Functions (on-prem) Containers, KEDA
+- Bicep IaC, KeyVaults, App Config, API Management
+- SignalR serverless, React
+- Patterns
+
 - using Zoom it as a productivity tool

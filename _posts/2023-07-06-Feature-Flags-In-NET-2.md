@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Feature Flags in .NET - (Post 2)
-date:       2023-07-04
+date:       2023-07-06
 summary:    This is our continuation in exploring Feature Flags in .NET series.
 categories: .NET, Azure, Feature-Flags
 ---

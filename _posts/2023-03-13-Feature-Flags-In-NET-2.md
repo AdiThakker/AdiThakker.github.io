@@ -9,7 +9,7 @@ categories: .NET, Azure, Feature-Flags
 
 Hello Folks! I have returned after a significant break and recently wrapped up a project. Therefore, I now have some spare time to resume blogging, allowing us to pick up from where we last left off 😊. Now, let's continue with this post, which serves as a continuation of our [previous]({{site.url}}/Feature-Flags-In-NET-1) discussion on Feature Flags in .NET.
 
-If you have read through the previous post, you know that the essence of the Time Window feature evaluation is mainly in its [TimeWindowFeatureFilter](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilters/TimeWindowFilter.cs), where it evaluates [TimeWindowFilterSettings](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilters/TimeWindowFilterSettings.cs). Based on how its configured, if uses the built-in [ConfigurationFeatureDefinitionProvider](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/ConfigurationFeatureDefinitionProvider.cs) to construct its [FeatureDefinition](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureDefinition.cs). This is all very nice, as long as you are using one of the preexisiting filters. 
+If you have read through the previous post, you know that the essence of the Time Window feature evaluation is mainly in its [TimeWindowFeatureFilter](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilters/TimeWindowFilter.cs), where it evaluates [TimeWindowFilterSettings](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilters/TimeWindowFilterSettings.cs). Based on how its configured, it uses the built-in [ConfigurationFeatureDefinitionProvider](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/ConfigurationFeatureDefinitionProvider.cs) to construct its [FeatureDefinition](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureDefinition.cs). This is all very nice, as long as you are using one of the preexisiting filters. 
 
 ***But what if you want to implement your own Custom logic for a feature evaluation?***
 
@@ -17,13 +17,13 @@ That's where we enter [ContextualFeatureFilter](https://github.com/microsoft/Fea
 
 ***NOTE: I have made updates to the source code since my previous post to utilize the ContextualFeatureFilter. Please make sure to refer to the latest code in the [repository](https://github.com/AdiThakker/FeatureManagement) for the most recent version.***
 
-In the previous post, we already had implemented a feature called ***VerboseLogging***, which leveraged  [TimeWindow](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilters/TimeWindowFilter.cs) for its evaluation. In this example, we will add a new feature called ***AddressLogging***, which will log address, if it matches our configured criteria.
+In the previous post, we already had implemented a feature called ***VerboseLogging***, which leveraged  [TimeWindow](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilters/TimeWindowFilter.cs) for its evaluation. In this example, we will add a ***new feature*** called ***AddressLogging***, which will display address, if it matches our configured criteria.
 
-So let's get started.
+So let's get started!!!
 
 ## Configuration
 
-Again, we leverage ***appSettings.json*** for configuration. 
+We again, leverage ***appSettings.json*** for configuration. 
 
 ~~~json
 "FeatureManagement": {
@@ -37,10 +37,10 @@ Again, we leverage ***appSettings.json*** for configuration.
         }
       ]
     },
-   "AddressLogging": {       // Feature name
+   "AddressLogging": {                  // Feature name
       "EnabledFor": [
         {
-          "Name": "PersonAddress",    // Filter Condition (without Filter suffix)
+          "Name": "PersonAddress",      // Filter Condition (without Filter suffix)
           "Parameters": {
             "Address": "Famous Street"
           }
@@ -73,9 +73,11 @@ The key thing to note here is that we have added a new feature called ***Address
 }
 ~~~
 
-Our [PersonAddressFilter](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/FeatureManagement/Filters/PersonAddressFilter.cs) implements the [IContextualFeatureFilter](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/IContextualFeatureFilter.cs) and its ***EvaluateAsync*** method takes in a ***FeatureFilterEvaluationContext*** and a ***Person*** object. The [FeatureFilterEvaluationContext](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilterEvaluationContext.cs) has the context of the feature evaluation, which includes the ***Parameters*** (of type ***IConfiguration***) and the ***FeatureName***. The ***Person*** object is the object that we is used to evaluate our custom logic against. 
+Our [PersonAddressFilter](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/FeatureManagement/Filters/PersonAddressFilter.cs) implements the [IContextualFeatureFilter](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/IContextualFeatureFilter.cs) and its ***EvaluateAsync*** method takes in a ***FeatureFilterEvaluationContext*** and a ***Person*** object. 
 
-In the above case, if the person's address matches the address configured in the ***appSettings.json***, then the feature is enabled, otherwise it is disabled.
+The [FeatureFilterEvaluationContext](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/FeatureFilterEvaluationContext.cs) is the context used by [IFeatureFilter](https://github.com/microsoft/FeatureManagement-Dotnet/blob/main/src/Microsoft.FeatureManagement/IFeatureFilter.cs) to gain insight into what feature is being evaluated and the parameters needed to check whether the feature should be enabled. Our [Person](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/Person.cs) object is the instance that we is used to evaluate our custom logic against. 
+
+The key point in the above case is, if the person's address matches the address configured in the ***appsettings.json***, then the feature is enabled, otherwise it is disabled.
 
 
 ### Filter Registration
@@ -95,7 +97,7 @@ public static class FeatureManagerExtensions
 }
 ~~~
 
-Our custom extension [FeatureManagerExtensions](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/FeatureManagement/FeatureManagerExtensions.cs) class, is used to register our filters. It's ***AddFeatureConfiguration*** method takes in an ***Action<IFeatureManagementBuilder>***, which is used to register additional filters. 
+Our custom extension [FeatureManagerExtensions](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/FeatureManagement/FeatureManagerExtensions.cs) class, is used to register our filters. It's ***AddFeatureConfiguration*** method takes in an ***Action*** delegate, which is used to register additional filters. 
 
 In our case, we will use it to register our ***PersonAddressFilter*** and that's shown below in our [Program](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/Program.cs). You can see the call to ***AddFeatureFilter***, which takes in our ***PersonAddressFilter***.
 
@@ -114,9 +116,9 @@ var app = Host.CreateDefaultBuilder()
     .Build();
 ~~~
 
-### Filter Evaluation.
+### Filter Evaluation
 
-This part of code is modified from the previous post, I have moved the this logice to a separate [PersonExtensions](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/PersonExtensions.cs) class as shown below.
+***This part of code is modified from our previous post***, I have moved the feature evaluation logic to a separate [PersonExtensions](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/PersonExtensions.cs) class as shown below.
 
 ~~~csharp
 public static class PersonExtensions
@@ -135,7 +137,9 @@ public static class PersonExtensions
 }
 ~~~
 
-You can see above that we have added a new ***CustomDisplay*** method, which takes in the ***IFeatureFlagManagement*** isntance and uses it to evaluate the ***AddressLogging*** feature. This is done by passing in the ***Person*** object and the ***FeatureName*** to the [FeatureFlagManagement](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/FeatureManagement/FeatureFlagManagement.cs) ***IsFeatureEnabledAsync*** method.
+The new ***CustomDisplay*** method is now added, which takes in the ***IFeatureFlagManagement*** instance and uses it to evaluate the ***AddressLogging*** feature. 
+
+This is done by passing in the ***Person*** object and the ***FeatureName*** to the [FeatureFlagManagement's](https://github.com/AdiThakker/FeatureManagement/blob/main/FeatureManagement.Console/FeatureManagement/FeatureFlagManagement.cs) ***IsFeatureEnabledAsync*** method.
 
 ### Running Sample
 
@@ -161,4 +165,4 @@ When we run the application, we see the following output.
 ![Setup]({{site.url}}/images/fflags-3.png){:height="100px" width="500px"}
 
 
-This completes our series on Feature Management. I hope you found this useful! We'll most likely revisit this topic in the future, esp. around [Azure App Configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/overview) as I am sure there will be more to come in this space.
+That's all Folks!!! This completes our series on Feature Management. I hope you found this useful. We'll most likely revisit this topic in the future, esp. around [Azure App Configuration](https://docs.microsoft.com/en-us/azure/azure-app-configuration/overview) as I am sure there will be more to come in this space.

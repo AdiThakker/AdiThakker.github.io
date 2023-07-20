@@ -8,7 +8,7 @@ categories: Certifications, Azure
 
 Happy to renew it for one more year!!!
 
-![Setup]({{site.url}}/images/renew-certification-1.png){:height="500px" width="700px"}
+![Setup]({{site.url}}/images/renew-certification-1.png){:height="500px" width="800px"}
 
 
 View my badge [here](https://t.co/ruGvBHhl93)

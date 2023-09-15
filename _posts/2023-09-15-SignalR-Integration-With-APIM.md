@@ -22,11 +22,15 @@ The combination of these three is incredibly powerful. With APIM, we have a reli
 
 You can find the source code of this [here](https://github.com/AdiThakker/ApimIaC/tree/main/Deployment). Let's go through some of the key parts.
 
-### Creating the APIM Instance
+### Creating resources in Azure
 
 For this, we used [modules](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/modules) in Bicep. 
 
-Modules in Bicep allow for the encapsulation of sets of Azure resources. It's a way to reuse and share the code for similar deployments. Our [APIM](https://github.com/AdiThakker/ApimIaC/blob/main/Deployment/modules/apim.bicep) module looks like this:
+Modules in Bicep allow for the encapsulation of sets of Azure resources. It's a way to reuse and share the code for similar deployments. 
+
+#### APIM Instance
+
+Our [APIM](https://github.com/AdiThakker/ApimIaC/blob/main/Deployment/modules/apim.bicep) module looks like this:
 
 ~~~javascript
 param location string
@@ -48,7 +52,7 @@ resource apim 'Microsoft.ApiManagement/service@2021-01-01-preview' = {
 output apimName string = apim.name
 ~~~
 
-### Creating the SignalR Instance
+#### SignalR Instance
 
 Similary, we setup SignalR using our [Signalr](https://github.com/AdiThakker/ApimIaC/blob/main/Deployment/modules/signalr.bicep) resource module as shown below:
 
@@ -68,7 +72,7 @@ output signalrName string = signalr.name
 
 ~~~
 
-Both the APIM and SignalR modules are bundled and orchestrated in a master Bicep file, which we called main.bicep. This main file ensures that the necessary dependencies between resources are maintained.
+Both the APIM and SignalR modules are bundled and orchestrated in a master Bicep file, which we called [main.bicep](https://github.com/AdiThakker/ApimIaC/blob/main/Deployment/main.bicep). This main file ensures that the necessary dependencies between resources are maintained and this is what orchestrates our deployment.
 
 ~~~javascript
 param location string = 'westus'
@@ -90,3 +94,4 @@ module signalr './modules/signalr.bicep' = {
   }
 }
 ~~~
+

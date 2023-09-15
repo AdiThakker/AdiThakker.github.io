@@ -10,7 +10,8 @@ If you have dabbled in the world of real-time communication in web applications,
 
 Now, imagine the power of integrating SignalR WebSocket endpoints into APIM. This would mean handling numerous real-time communications at scale, with the robust security and flexibility that APIM offers.
 
-In this first post, we will be walking through the process of integrating a SignalR WebSocket endpoint in APIM using Infrastructure as Code (IaC).
+***NOTE: In this first post, we will be walking through the process of deploying these resources using IaC. 
+The next post will cover  integrating SignalR WebSocket endpoint in APIM.***
 
 ## APIM, SignalR and Bicep 
 
@@ -95,3 +96,46 @@ module signalr './modules/signalr.bicep' = {
 }
 ~~~
 
+### Azure DevOps
+
+For automating the deployment of these resources, we integrated Bicep with Azure DevOps. We defined our CI/CD process in an [azure-pipelines.yml](https://github.com/AdiThakker/ApimIaC/blob/main/Deployment/azure-pipelines.yml) file, which ensures that our infrastructure gets deployed as code every time there are changes.
+
+~~~yaml
+trigger:
+  - main
+  
+pool:
+  vmImage: 'ubuntu-latest'
+
+stages:
+- template: pipeline-templates/deploy.yml
+parameters:
+  environment: 'dev'
+~~~
+
+The above pipeline uses [templates](https://github.com/AdiThakker/ApimIaC/tree/main/Deployment/pipeline-templates) for resuability, which looks like this:
+
+~~~yaml
+parameters:
+  - name: environment
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - staging
+      - prod
+
+stages:
+- stage: DeployResources_${{parameters.environment}}
+  displayName: Deploy Resources - {{parameters.environment}}
+  pool:
+    vmImage: 'ubuntu-latest'
+    
+~~~
+
+### Azure CLI
+
+If you prefer using Azure CLI for deploying resources, you can manually provision the required resources using Bicep and Azure CLI as shown in the [Read Me](https://github.com/AdiThakker/ApimIaC/blob/main/README.md)
+
+Alright Folks! That's all for now. In the next post, we will see how to integrate SignalR WebSocket endpoint in APIM. Stay tuned!

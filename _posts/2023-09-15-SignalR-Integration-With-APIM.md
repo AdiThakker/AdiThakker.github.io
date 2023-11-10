@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      SignalR Integration with APIM - Harnessing Real-time Communication (Post 1)
+title:      SignalR Integration with APIM - Real-time Communication (Post 1)
 date:       2023-09-15
 summary:    In this post, we will see how to integrate SignalR WebSocket endpoint in Azure APIM. 
 categories: Azure, WebSockets, SignalR, APIM

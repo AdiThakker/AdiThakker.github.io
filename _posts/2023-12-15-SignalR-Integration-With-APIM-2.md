@@ -1,10 +1,12 @@
 ---
 layout:     post
 title:      SignalR Integration with APIM - Real-time Communication (Post 2)
-date:       2023-10-15
+date:       2023-12-15
 summary:    Our continuation of how to integrate SignalR WebSocket endpoint in Azure APIM. 
 categories: Azure, WebSockets, SignalR, APIM
 ---
+
+I noticed that this was overdue for some time, so we will quickly wrap up this one and keep it short. 
 
 Having introduced the concept of integrating SignalR with APIM and deploying resources using Bicep in the previous post, we'll now take the next step: the actual integration of SignalR WebSocket endpoints into APIM. This integration lets us harness the full power of real-time communication managed by Azure API Management (APIM).
 
@@ -48,12 +50,24 @@ public static class SignalRFunction
         log.LogInformation("SignalR Negotiate function triggered.");
         return connectionInfo;
     }
+
+    [FunctionName("helloWebSockets")]
+    public static async Task<HttpResponseMessage> Run(
+    [HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestMessage req,
+    ExecutionContext context)
+    {
+      // WebSocket request handling logic
+      return new HttpResponseMessage(HttpStatusCode.OK);
+    }
 }
+ 
 ~~~
 
-This is a basic function that handles the SignalR negotiation. The function is triggered by an HTTP POST request and returns a SignalR connection info object, which contains a URL to the SignalR service and an access token. This allows clients to then connect to the SignalR service.
+The above snippet includes a basic **negotiate** function that handles the SignalR negotiation. The function is triggered by an HTTP POST request and returns a SignalR connection info object, which contains a URL to the SignalR service and an access token. This allows clients to then connect to the SignalR service.
 
-### Function App Deployment
+The other **helloWebSockets** function is a placeholder for the WebSocket request handling logic. This function is triggered by an HTTP GET or POST request and returns an HTTP response. The function can be used to broadcast messages to connected clients.
+
+### Function App Deployment Script
 
 ~~~javascript
 param location string
@@ -70,6 +84,9 @@ resource functionApp 'Microsoft.Web/sites@2021-06-01' = {
           name: 'AzureSignalRConnectionString'
           value: 'YOUR_SIGNALR_CONNECTION_STRING'
         }
+        {
+          // other app settings  
+        }
       ]
     }
   }
@@ -77,3 +94,58 @@ resource functionApp 'Microsoft.Web/sites@2021-06-01' = {
 
 output functionName string = functionApp.name
 ~~~
+
+3. Exposing both Endpoints in APIM Using Bicep:
+
+We modify our apim.bicep file in the previous post to expose both the endpoints as shown below:
+
+~~~javascript
+resource negotiateApi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = {
+  name: '${apimService.name}/negotiate-api'
+  properties: {
+    displayName: 'NegotiateAPI'
+    serviceUrl: 'https://${functionName}.azurewebsites.net'
+    path: 'negotiate'
+    protocols: [
+      'https'
+    ]
+  }
+}
+
+
+resource wssApi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = {
+  name: '${apimService.name}/wss-api'
+  properties: {
+    displayName: 'WSSAPI'
+    serviceUrl: 'https://${functionName}.azurewebsites.net'
+    path: 'wss'
+    protocols: [
+      'wss'
+    ]
+  }
+}
+
+~~~
+
+In the above we pass ${functionName} as a parameter to the apim.bicep file, which is the name of the function app we deployed in the previous step.
+
+**NOTE:** When exposing these enpoints in APIM is always advisable to use policies to secure the endpoints. The following [link](https://learn.microsoft.com/en-us/azure/api-management/websocket-api?tabs=portal#add-a-policy-to-the-wss-api) explains how to add a policy to the wss API operation.
+
+ This could be done as follows:
+
+ ~~~javascript
+ resource apiPolicy 'Microsoft.ApiManagement/service/apis/policies@2021-04-01-preview' = {
+  name: 'policy'
+  properties: {
+    format: 'rawxml'
+    value: '<policies>
+              <inbound>
+                <base />
+                 // policy logic
+              </inbound>
+            </policies>'
+  }
+}
+~~~ 
+
+So there you have it, we have successfully integrated SignalR with APIM and exposed the endpoints to our clients. I had to keep this one short with minimum examples, but I hope this helps you get started with your SignalR and APIM integration.

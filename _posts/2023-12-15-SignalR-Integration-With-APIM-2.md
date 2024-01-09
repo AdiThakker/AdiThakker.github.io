@@ -18,13 +18,11 @@ So lets get started!
 
 ## SignalR and APIM Integration
 
-1. Configuring APIM for WebSocket:
+### Configuring APIM for WebSocket:
    
 First to configure APIM for WebSocket, you need to create a new WebSocket API. The following [link](https://learn.microsoft.com/en-us/azure/api-management/websocket-api?tabs=portal#add-a-websocket-api) explains how to create a WebSocket API.
 
-2. Azure Function App for SignalR:
-   
-### Function App Code
+### Azure Function App for SignalR:
    
 Next, we'll create an Azure Function that acts as a hub for our SignalR service. This function will manage connections and broadcast messages to connected clients.
 
@@ -67,7 +65,7 @@ The above snippet includes a basic **negotiate** function that handles the Signa
 
 The other **helloWebSockets** function is a placeholder for the WebSocket request handling logic. This function is triggered by an HTTP GET or POST request and returns an HTTP response. The function can be used to broadcast messages to connected clients.
 
-### Function App Deployment Script
+Next, we look at the Bicep code to deploy the Function App:
 
 ~~~javascript
 param location string
@@ -95,9 +93,9 @@ resource functionApp 'Microsoft.Web/sites@2021-06-01' = {
 output functionName string = functionApp.name
 ~~~
 
-3. Exposing both Endpoints in APIM Using Bicep:
+### Exposing both Endpoints in APIM Using Bicep:
 
-We modify our apim.bicep file in the previous post to expose both the endpoints as shown below:
+As a final step, we modify our apim.bicep file in the previous post to expose both the endpoints as shown below:
 
 ~~~javascript
 resource negotiateApi 'Microsoft.ApiManagement/service/apis@2021-04-01-preview' = {

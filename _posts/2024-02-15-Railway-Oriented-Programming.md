@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Embracing Railway-Oriented Programming in .NET – A Practical Approach 
+title:      Embracing Railway-Oriented Programming in .NET – A Sample Approach 
 date:       2024-02-15
 summary:    A Reference for how to leverage Railway Oriented Programming concepts in .NET.
 categories: .NET, Functional Programming
@@ -50,7 +50,7 @@ public class Result<TSuccess, TFailure> : IResult<TSuccess, TFailure>
 }
 ~~~
 
-Imagine your function as two parallel tracks. The success track continues when operations are successful. The failure track is taken when an error occurs. With Railway Oriented Programming, these tracks never intersect, simplifying error handling
+Think your function as two parallel tracks. The success track continues when operations are successful. The failure track is taken when an error occurs. With Railway Oriented Programming, these tracks never intersect, simplifying error handling, the key that makes this work is the Bind function.
 
 ### Bind function
 
@@ -72,15 +72,18 @@ public static Func<Result<TValue, TFailure>, Result<TSuccess, TFailure>> Bind<TV
 }
 ~~~
 
-Applying the Bind function via an extension method, we can chain functions together, as shown below:
+To make the Bind function easily attachable (if that's a word 😉) is an extension method, as shown below which can help **adapt and/or chain** functions:
 
 ~~~csharp
 public static Result<TSuccess, TFailure> Then<TValue, TSuccess, TFailure>(this Result<TValue, TFailure> instance, Func<TValue, Result<TSuccess, TFailure>> map) => Bind(map)(instance);
 ~~~
 
+Now lets look at how this plays out in our validation example, using the above constructs.
+
 ### Validation Example
 
-Shown below is our validation example using the above constructs.
+Let's say we have a Customer class and we want to validate the Name and Age properties. We can create a CustomerResult class that inherits from Result and then create a CustomerValidation class that contains the validation methods. The validation methods will return a CustomerResult, which can then be chained together using the Then method.
+ 
 
 ~~~csharp
 public class Customer
@@ -103,7 +106,19 @@ public static class CustomerValidation
 
     public static CustomerResult ValidateAge(Customer customer) => customer.Age is > 0 and < 100 ? new CustomerResult(customer) : new CustomerResult(new InvalidDataException("Age Invalid"));
 }
+
+Customer customer = new Customer();
+customer.Name = "";
+customer.Age = 10;
+
+var result = CustomerValidation.ValidateName(customer).Then(CustomerValidation.ValidateAge);
+Console.WriteLine(result.Success  is null ? result.Failure : result.Success);
 ~~~
 
+You can see in the above that even though ValidateName and ValidateAge take Customer as input, since they return CustomerResult, the can be chained using the Then "adapter" method.
 
-So there you have it, we have successfully integrated SignalR with APIM and exposed the endpoints to our clients. I had to keep this one short with minimum examples, but I hope this helps you get started with your SignalR and APIM integration.
+So there you see a simple fluent invocation of the validation methods using ROP. 
+
+If you are interested in reading more about his pattern, you are look at Scott Wlaschin's [Railway Oreiented Programming ](https://fsharpforfunandprofit.com/posts/recipe-part2/) post.He also refers to this as [Pipeline Oriented Programming] (https://www.youtube.com/watch?v=ipceTuJlw-M).
+
+

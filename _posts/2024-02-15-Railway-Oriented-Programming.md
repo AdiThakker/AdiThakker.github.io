@@ -119,6 +119,6 @@ You can see in the above that even though ValidateName and ValidateAge take Cust
 
 So there you see a simple fluent invocation of the validation methods using ROP. 
 
-If you are interested in reading more about his pattern, you are look at Scott Wlaschin's [Railway Oriented Programming](https://fsharpforfunandprofit.com/posts/recipe-part2/) post.He also refers to this as [Pipeline Oriented Programming] (https://www.youtube.com/watch?v=ipceTuJlw-M) .
+If you are interested in reading more about his pattern, you are look at Scott Wlaschin's [Railway Oriented Programming](https://fsharpforfunandprofit.com/posts/recipe-part2/) post.He also refers to this as [Pipeline Oriented Programming](https://www.youtube.com/watch?v=ipceTuJlw-M) .
 
 

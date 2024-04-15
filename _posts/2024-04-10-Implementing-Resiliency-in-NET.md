@@ -70,33 +70,25 @@ The `Try<T>` method is the main method that you would call to perform the action
 static T Break<T>(string correlationId, Func<T> run, string message)
 {
     Console.WriteLine($"{message}");
-    try
-    {
-        circuitStatus.AddOrUpdate(correlationId, CircuitState.Open, (key, state) => state = CircuitState.Open);
+    circuitStatus.AddOrUpdate(correlationId, CircuitState.Open, (key, state) => state = CircuitState.Open);
 
-        // circuit-break
-        var latestState = Enumerable.Range(1, 3)
-                            .Select(count =>
-                            {
-                                Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, count))).GetAwaiter().GetResult();  // you can probably sleep till threshold reached                              
-                                var status = Number.Next(int.MaxValue) % 2 == 0; // backup operation status
-                                Console.WriteLine($"Perform backup operation {count}: status succeeded - {status}");
-                                return status;
-                            })
-                            .Count(_ => _ == false)
-                            .GetCurrentState();
+    // circuit-break
+    var latestState = Enumerable.Range(1, 3)
+                        .Select(count =>
+                        {
+                            Task.Delay(TimeSpan.FromSeconds(Math.Pow(2, count))).GetAwaiter().GetResult();  // you can probably sleep till threshold reached                              
+                            var status = Number.Next(int.MaxValue) % 2 == 0; // backup operation status
+                            Console.WriteLine($"Perform backup operation {count}: status succeeded - {status}");
+                            return status;
+                        })
+                        .Count(_ => _ == false)
+                        .GetCurrentState();
 
-        Console.WriteLine($"Timeout complete, Latest State : {latestState}.");
-        circuitStatus.AddOrUpdate(correlationId, latestState, (key, state) => state = latestState);
-        
-        // resume
-        return Try(correlationId, run);
-    }
-    catch (Exception)
-    {
-        // TODO logic just throw for now
-        throw;
-    }
+    Console.WriteLine($"Timeout complete, Latest State : {latestState}.");
+    circuitStatus.AddOrUpdate(correlationId, latestState, (key, state) => state = latestState);
+    
+    // resume
+    return Try(correlationId, run);
 }
 
 private static CircuitState GetCurrentState(this int failures )

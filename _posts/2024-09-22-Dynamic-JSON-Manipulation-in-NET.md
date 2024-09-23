@@ -6,13 +6,13 @@ summary:    A quick reference on how to manipulate JSON dynamically in .NET.
 categories: .NET, JSON
 ---
 
-Recently on a project that i was working on, i was faced with a choice: should we use strongly-typed objects for safety and structure, or should we opt for dynamic JSON manipulation for flexibility and speed? Each approach has its merits, but in this post, we’ll explore how to leverage dynamic JSON manipulation using System.Text.Json—while also touching on when it’s beneficial to use strongly-typed objects.
+Recently on a project that i was working on, i was faced with a choice: should we use strongly-typed objects for safety and structure, or should we opt for dynamic JSON manipulation for flexibility and speed? Each approach has its merits, but in this post, we’ll explore how to leverage dynamic JSON manipulation using **System.Text.Json**, while also touching on when it’s beneficial to use strongly-typed objects.
 
-We’ll walk through a simple example of a common JSON modification task, discuss the reasoning behind immutability and pure functions, and conclude with a comparison of the benefits and drawbacks of each approach.
+We’ll walk through a simple example of a common JSON modification task, and conclude with a comparison of the benefits and drawbacks of each approach.
 
 ## Dynamic JSON Manipulation
 
-***NOTE:*** I have simplified the JSON structure for the sake of clarity. The same principles apply to more complex JSON structures (like i had in my actual project).
+***NOTE:*** I have simplified the JSON structure for the sake of clarity. The same principles apply to more complex JSON structures (*like i had in my actual project*).
 
 So, let's consider this JSON structure:
 
@@ -29,7 +29,7 @@ So, let's consider this JSON structure:
 
 ### Modifying JSON with JsonDocument and JsonElement
 
-JsonDocument and JsonElement are core to System.Text.Json and provide an efficient way to parse, read, and modify JSON data. Here’s an example of how to modify a JSON structure dynamically:
+**JsonDocument** and **JsonElement** are core to **System.Text.Json** and provide an efficient way to parse, read, and modify JSON data. Here’s an example of how to modify a JSON structure dynamically:
 
 ~~~csharp
 public string ModifyJson(string originalJson)
@@ -82,15 +82,15 @@ public string ModifyJson(string originalJson)
 
 In the above snippet:
 
-- JsonDocument is used to parse and read the original JSON.
+- **JsonDocument** is used to parse and read the original JSON.
 
-- Utf8JsonWriter creates a new JSON structure by writing the modified elements.
+- **Utf8JsonWriter** creates a new JSON structure by writing the modified elements.
 
-- The items array is processed by copying all original items, then modifying the first one before appending it to the array.
+- The **items array** is processed by copying all original items, then modifying the first one before appending it to the array. ***NOTE:When parsing dynamically, pay attention to JsonArray, JsonObject and JsonValue types. They are used to navigate and manipulate the JSON structure.***
 
 This method is fast, avoids serialization overhead, and gives you flexibility when dealing with unknown or constantly changing data structures.
 
-Here’s an example using JsonNode to achieve the same result:
+Here’s an example using **JsonNode** to achieve the same result:
 
 ~~~csharp
 public string ModifyJsonWithJsonNode(string originalJson)
@@ -109,7 +109,7 @@ public string ModifyJsonWithJsonNode(string originalJson)
 }
 ~~~
 
-In this example, JsonNode provides a more concise way to manipulate JSON data. It’s a good choice when you need to work with JSON in a more dynamic and flexible manner.
+In this example, **JsonNode** provides a more concise way to manipulate JSON data. It’s a good choice when you need to work with JSON in a more dynamic and flexible manner.
 
 - JsonNode.Parse parses the original JSON into a mutable structure.
 
@@ -119,17 +119,16 @@ In this example, JsonNode provides a more concise way to manipulate JSON data. I
 
 
 ### Benefits of Dynamic JSON Manipulation
-***Flexibility:*** Dynamic manipulation is perfect when the structure of your JSON is not well defined or may change frequently. It allows you to work with the JSON directly without needing to update object models constantly. *** In my project we were writing a transformation rule engine where the rules were stored in Text or JSON and the structure of the rules could change frequently.***
+***Flexibility:*** Dynamic manipulation is perfect when the structure of your JSON is not well defined or may change frequently. It allows you to work with the JSON directly without needing to update object models constantly. ***In my project we were writing a transformation rule engine where the rules were stored in Text or JSON and the structure of the rules could change frequently.***
 
 ***Performance:*** It can be more efficient to work directly with JSON data rather than serializing and deserializing into C# objects, especially for small and quick modifications.
 
-***Simplicity:*** For small tasks or data transformations, working dynamically with JsonDocument or JsonNode offers a lightweight alternative to defining and maintaining strongly-typed objects.
+***Simplicity:*** For small tasks or data transformations, working dynamically with **JsonDocument** or **JsonNode** offers a lightweight alternative to defining and maintaining strongly-typed objects.
 
 However, dynamic manipulation comes with its own set of challenges. Since there’s no compile-time type checking, it’s easy to introduce runtime errors, and debugging can be more difficult, especially in complex or nested data structures.
 
-### Strongly-Typed Objects
-
-I am not going to cover the Strongly-Typed Objects here, since we all know how to work with them. But I'll list some of their benefits below:
+## Strongly-Typed JSON Objects Manipulation
+I am not going to cover the Strongly-Typed objects here, since we all know how to work with them. But I'll list some of their benefits below:
 
 ### Benefits of Strongly-Typed Objects:
 

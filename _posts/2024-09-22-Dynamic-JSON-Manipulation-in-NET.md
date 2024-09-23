@@ -58,7 +58,7 @@ public string ModifyJson(string originalJson)
             {
                 if (itemProp.NameEquals("name"))
                 {
-                    writer.WriteNumber("name", "item3"); // Change the ID
+                    writer.WriteNumber("name", "item3"); // Change the name property
                 }
                 else
                 {
@@ -98,9 +98,9 @@ public string ModifyJsonWithJsonNode(string originalJson)
     var jsonNode = JsonNode.Parse(originalJson)!;
     var itemsArray = jsonNode["items"]!.AsArray();
 
-    // Clone the first item and modify its "id"
+    // Clone the first item and modify its "name" property
     var newItem = itemsArray[0]!.Clone();
-    newItem["items"] = "item3";
+    newItem["name"] = "item3";
 
     // Append the modified item to the array
     itemsArray.Add(newItem);

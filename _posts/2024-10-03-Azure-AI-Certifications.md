@@ -10,9 +10,9 @@ With all the AI buzz going around, I thought it would be a good idea to get an A
 
 So, I am happy to get a new Azure certification, this time it's Azure AI Engineer Associate, which I achieved by taking the following exams:
 
- - [AI-900](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/) exam. 
+ - [AI-900: Azure AI Fundamentals](https://learn.microsoft.com/en-us/credentials/certifications/azure-ai-fundamentals/) exam. 
   
- - [AI-102](https://learn.microsoft.com/en-us/certifications/azure-ai-engineer/) exam. 
+ - [AI-102: Azure AI Engineer Associate](https://learn.microsoft.com/en-us/certifications/azure-ai-engineer/) exam. 
 
 
 ![Setup]({{site.url}}/images/az-500.svg){:height="500px" width="700px"}

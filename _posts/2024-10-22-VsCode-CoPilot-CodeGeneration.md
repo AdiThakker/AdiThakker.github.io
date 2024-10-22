@@ -2,7 +2,7 @@
 layout:     post
 title:      Leveraging GitHub Copilot for automating File-Based SQL Generation
 date:       2024-10-22
-summary:    A quick guide on how to leverage GitHub Copilot to generate SQL files. 
+summary:    A quick reference on how to leverage GitHub Copilot to automatically generate SQL. 
 categories: GitHub, Copilot, VSCode
 ---
 
@@ -26,18 +26,18 @@ Equipped with the above, Copilot Chat becomes a powerful ally, taking care of th
 
 Let’s say we have two files:
 
-1. instructions.txt – This file contains rules or instructions on how to structure SQL queries for specific workspace agents.
+1. **instructions.txt** – This file contains rules or instructions on how to structure SQL queries for specific workspace agents.
 
-2. data.csv – This file contains the raw data (e.g., table names, column names) that needs to be used in the SQL queries.
+2. **data.csv** – This file contains the raw data (e.g., table names, column names) that needs to be used in the SQL queries.
 
 
 Our goal is to get GitHub Copilot Chat to:
 
-1. Read the instructions from instructions.txt.
+1. Read the instructions from `instructions.txt`.
 
-2. Extract relevant data from data.csv.
+2. Extract relevant data from `data.csv`.
 
-3. Use both the instructions and the data to generate custom SQL statements.
+3. Generate custom SQL statements.
 
 
 ## Example: The Input Files
@@ -74,16 +74,18 @@ Following screenshot shows the Copilot Chat commands and the generated SQL queri
 
 ![Setup]({{site.url}}/images/copilot-img-2.png){:height="500px" width="700px"}
 
-### Making it dynamic
+### Making it extensible
 
 The above setup can easily be adapted for more complex scenarios. For instance, if you needed to add more rules or handle additional tables or joins, you could simply update the `instructions.txt` file and let Copilot Chat regenerate the queries accordingly.
 
 Similarly, if the `data.csv` file is updated with new workspaces, Copilot Chat can regenerate the corresponding SQL queries, making this process both scalable and maintainable.
 
-***Note: your actual IDE experience may vary. For me omitting the @Workspace in the prompt failed to generate the SQL queries. Also you might be able to accomplish similar results using different variation of the prompt. The above example just highlights how we accomplished our task.***
-
 So there you have it! We quickly saw how GitHub Copilot Chat can be used to automate SQL generation based on file-based inputs. 
 This approach can be extended to other use cases where you need to generate code based on externalized configuration or data files.such as generating API endpoints, handling database migrations, etc.
+
+***Note: your actual IDE experience may vary. For me, omitting the @Workspace in the prompt failed to generate the SQL queries. Also you might be able to accomplish similar results using different variation of the prompt. The above example just highlights how we accomplished our task.***
+
+Please feel free to leave comments about any other options or variations you have tried.
 
 Happy coding with Copilot Chat! 🚀
 

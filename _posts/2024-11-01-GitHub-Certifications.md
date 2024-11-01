@@ -9,11 +9,7 @@ categories: GitHub, Certifications, DevOps, Foundations
 
 With my continued interest in refining developer workflows, I thought it would be a good idea to pursue a few GitHub certifications. I’m happy to share that I’ve now completed certifications for 
 
-![Setup]({{site.url}}/images/foundations.png){:height="400px" width="300px"}
-
-![Setup]({{site.url}}/images/actions.png){:height="400px" width="300px"} 
-
-![Setup]({{site.url}}/images/copilot.png){:height="400px" width="300px"}
+![Setup]({{site.url}}/images/foundations.png){:height="200px" width="100px"} ![Setup]({{site.url}}/images/actions.png){:height="200px" width="100px"} ![Setup]({{site.url}}/images/copilot.png){:height="200px" width="100px"}
 
 These certifications covered everything from GitHub basics to advanced workflows and AI-assisted coding, each providing valuable insights. Now... Looking forward to putting these new skills into practice!
 

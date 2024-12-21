@@ -2,63 +2,163 @@
 layout:     post
 title:      Exploring Sementic Kernel
 date:       2025-12-20
-summary:    A follow up to one of my previous post on how to leverage Semantic Kernel to automatically generate SQL. 
+summary:    An extension to one of my previous post on how to leverage Semantic Kernel to automatically generate SQL. 
 categories: Gen AI, Semantic Kernel
 ---
 
-In my [previous blog post]({{site.url}}/VsCode-CoPilot-CodeGeneration), we explored how **GitHub Copilot Chat** can dynamically generate SQL queries based on instructions and data files. This is all well and good, but what if we want to build this functionality into a custom application?  
+In my [previous blog post]({{site.url}}/VsCode-CoPilot-CodeGeneration), we explored how **GitHub Copilot Chat** can dynamically generate SQL queries based on instructions and data files. It demonstrated how tools like `@Workspace`, slash commands, and scoped variables such as `#file` could orchestrate workflows efficiently. 
 
-Today, we’ll build a same **Custom SQL generation application** using **Semantic Kernel** and  **Ollama - Local LLM**.
+This is all well and good, but it's all within an IDE. What if we want to build this functionality into a custom application?  This blog post builds on that by leveraging **Semantic Kernel**  and  **Ollama - Local LLM** to create a custom SQL generation application.
 
-This approach not only gives you complete control over the LLM but also provides an excellent learning opportunity to understand:
-- How Semantic Kernel orchestrates AI workflows.
-- How to use local LLMs like **Ollama** for privacy and cost savings.
-- Ways to mimic **Visual Studio Code functionality** (e.g., file-based workflows, dynamic prompts) in your custom application.
+## **Why Extend to a Custom Application?**
+
+GitHub Copilot Chat is tightly integrated into IDEs, which makes it convenient for developers. However, a custom application provides as excellent learning opportunity to understand the workflow and also allows for:  
+- **Full Model Control**: Host and manage your own LLM (e.g., Ollama) for complete autonomy.  
+- **Enhanced Privacy**: Keep your data local without relying on cloud services.  
+- **Extensibility**: Adapt the workflow to generate not only SQL queries but also API endpoints, test cases, or infrastructure code.  
+- **Cost Efficiency**: Eliminate cloud API usage fees by running LLMs locally.  
+
+With **Semantic Kernel**, we can replicate and extend Copilot’s functionality, integrating prompt templates, dynamic arguments, and file-based workflows into a standalone application.
 
 ---
-
 ## **What is Semantic Kernel?**
 
-**Semantic Kernel** is an open-source SDK by Microsoft that bridges traditional programming and AI-driven workflows. It enables developers to:
-- **Orchestrate AI workflows**: Combine natural language prompts, custom logic, and code execution seamlessly.
-- **Leverage Semantic Functions**: Dynamically inject variables into prompts for real-time processing.
-- **Extend Capabilities with Plugins**: Create reusable, modular skills for tasks like file handling or API integrations.
+**[Semantic Kernel](https://github.com/microsoft/semantic-kernel)** is an open-source SDK from Microsoft designed to orchestrate AI-driven workflows. It provides abstraction to AI models, plugins, and semantic functions, enabling developers to: 
 
-### **Core Concepts**
-1. **Kernel**:
-   - The central component that acts as the orchestrator for LLM interactions.
-   - [Learn more about the Kernel](https://learn.microsoft.com/en-us/semantic-kernel/concepts/what-is-the-kernel)
-
-2. **Plugins**:
-   - Extend the Kernel's functionality by encapsulating reusable tasks (e.g., file handling or data preprocessing).
-   - [Learn more about Plugins](https://learn.microsoft.com/en-us/semantic-kernel/concepts/plugins)
-
-3. **Semantic Functions**:
-   - Prompts with placeholders (e.g., `{{variable}}`) that can be dynamically rendered with runtime data.
-   - [Learn more about Semantic Functions](https://learn.microsoft.com/en-us/semantic-kernel/concepts/prompts/prompt-template-syntax)
-
-4. **Kernel Arguments**:
-   - A flexible structure for passing variables into functions or prompts.
-   - [Learn more about Kernel Arguments](https://learn.microsoft.com/en-us/semantic-kernel/concepts/plugins-and-functions)
-
----
+- **Integrate Natural Language Understanding**: Combine AI-driven tasks like text generation or summarization into applications.  
+- **Use Plugins and Functions**: Build modular and reusable workflows with plugins or prompt-based semantic functions.  
+- **Leverage AI Models Flexibly**: Work with cloud-based services like OpenAI or local LLMs like Ollama.  
 
 ## **What is Ollama?**
 
-**Ollama** is a lightweight local runtime for hosting large language models (LLMs) on your machine. It allows you to:
+**Ollama** is a local runtime for hosting large language models (LLMs) directly on your machine. It provides:  
+- **Privacy**: All data processing happens locally, ensuring complete control over sensitive information.  
+- **Cost Efficiency**: Avoid cloud API fees by running LLMs like **phi3** locally.  
+- **Performance Optimization**: Ollama is designed to run efficiently on modern hardware, making it ideal for developers needing on-premises AI capabilities.  
+
+
+## **What is Ollama?**
+
+**[Ollama](https://github.com/ollama/ollama)** is a lightweight local runtime for hosting large language models (LLMs) on your machine. It allows you to:
 - Run LLMs **locally** for enhanced privacy.
 - Avoid cloud-based API costs, enabling free usage after setup.
 - Use models like **phi3**, optimized for on-premises use cases.
 
 ---
 
+So with all this in mind, let's dive into how we can leverage **Semantic Kernel** and **Ollama** to build a custom SQL generation application.
+All the source code is available [here](https://github.com/AdiThakker/SemanticKernel.Plugins) for reference.  
+
+
 ## **Getting Started with Ollama on Windows**
 
-### **1. Install Ollama**
+### **Install Ollama**
 1. Download the **Ollama installer** for Windows from the [official website](https://ollama.ai/download).
 2. Follow the installation steps to set up Ollama on your machine.
 
-### **2. Install the Model**
+### **Install the Model**
 Once Ollama is installed, use the following PowerShell command to download and install the **phi3** model:
 ```powershell
 ollama pull phi3
+```
+
+### **Verify and run the Model**
+```powershell
+ollama list
+ollama run phi3
+```
+
+Following is a screenshot of the installed model:
+![Setup]({{site.url}}/images/sk-1.png){:height="500px" width="700px"}
+
+**NOTE**: By default, the server runs at http://localhost:11434. You can now integrate this local LLM with Semantic Kernel.
+
+
+### **Wofkflow Setup**
+
+All the related files are available in the [Plugin](https://github.com/AdiThakker/SemanticKernel.Plugins/tree/main/SemanticKernel.Plugins/Plugin) folder. Let's revisit the files from the previous post:
+
+#### **instructions.txt**
+```plaintext
+SELECT statement for agent workspaces should follow this format:
+- FROM the table [workspace_name]
+- SELECT all columns where status = 'active'
+- The query should be limited to 100 results.
+
+If a workspace has more than 1 table, join them on the 'id' field.
+```
+
+#### **data.csv**
+```plaintext
+workspace_name,table1,table2
+SalesWorkspace,sales_data,NULL
+HRWorkspace,employees,NULL
+FinanceWorkspace,transactions,account_details
+```
+
+#### **prompt.txt**
+```plaintext
+You are an SQL assistant. Based on the instructions and data provided, generate SQL queries.  
+
+### Instructions:  
+{{$instructions}}  
+
+### Data:  
+{{$csvData}}  
+
+Rules:  
+- If only one table exists, select all columns where status = 'active', limited to 100 rows.  
+- If two tables exist, join them on the 'id' field and apply the same rules.  
+```
+
+**NOTE**: The `{{instructions}}` and `{{csvData}}` placeholders are dynamically replaced with the content of `instructions.txt` and `data.csv`, respectively and the final prompt is generated, which is shown below:
+
+```csharp
+using Microsoft.SemanticKernel;
+using Microsoft.SemanticKernel.TextGeneration;
+using System.IO;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        // Step 1: Initialize Semantic Kernel with Ollama Text Generation
+        var builder = Kernel
+            .CreateBuilder()
+            .AddOllamaTextGeneration("phi3", new Uri("http://localhost:11434"));
+
+        var kernel = builder.Build();
+
+        // Step 2: Load external files
+        var instructions = await File.ReadAllTextAsync("Plugin/instructions.txt");
+        var csvData = await File.ReadAllTextAsync("Plugin/data.csv");
+        var prompt = await File.ReadAllTextAsync("Plugin/prompt.txt");
+
+        // Step 3: Create a semantic function from the prompt template
+        var sqlPlugin = kernel.CreateFunctionFromPrompt(prompt);
+
+        // Step 4: Generate SQL by invoking the function with dynamic arguments
+        var response = await sqlPlugin.InvokeAsync(kernel, new KernelArguments
+        {
+            ["instructions"] = instructions,
+            ["csvData"] = csvData
+        });
+
+        // Step 5: Output the generated SQL
+        Console.WriteLine("Generated SQL:");
+        Console.WriteLine(response);
+    }
+}
+```
+
+### **Running the Application**
+Following is the screenshot of the generated SQL:
+![Setup]({{site.url}}/images/sk-2.png){:height="500px" width="700px"}
+
+
+## Final Thoughts
+By combining Semantic Kernel and Ollama, we’ve created a flexible, extensible workflow for SQL generation. Whether automating SQL queries, generating API endpoints, or creating infrastructure-as-code scripts, this setup provides an excellent foundation.
+
+What would you build with Semantic Kernel? Let me know in the comments below! 🚀
+
+Happy coding!

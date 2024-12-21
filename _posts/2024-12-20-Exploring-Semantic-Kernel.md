@@ -60,7 +60,7 @@ ollama run phi3
 ```
 
 Following is a screenshot of the installed model:
-![Setup]({{site.url}}/images/sk-1.png){:height="500px" width="700px"}
+![Setup]({{site.url}}/images/sk-1.png){:height="500px" width="900px"}
 
 **NOTE**: By default, Ollama runs at http://localhost:11434. You can now integrate this local LLM with Semantic Kernel.
 
@@ -159,7 +159,7 @@ https://learn.microsoft.com/en-us/semantic-kernel/concepts/semantic-kernel-compo
 
 ## **Running the Application**
 Following is the screenshot of the generated SQL:
-![Setup]({{site.url}}/images/sk-2.png){:height="500px" width="700px"}
+![Setup]({{site.url}}/images/sk-2.png){:height="500px" width="900px"}
 
 
 ## Final Thoughts

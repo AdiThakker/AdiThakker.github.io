@@ -10,8 +10,5 @@ Renewed this for one more year!!! I might reconsider posting this every year.May
 
 But for now, I am happy to have renewed this certification. 
 
-![Setup]({{site.url}}/images/renew-certification-1.png){:height="500px" width="800px"}
-
-
-View my badge [here](https://t.co/ruGvBHhl93)
+View my badge [here](https://learn.microsoft.com/api/credentials/share/en-us/AdityaThakker-6011/D02570616B6A004A?sharingId=E9FBB523FCFC443D)
  

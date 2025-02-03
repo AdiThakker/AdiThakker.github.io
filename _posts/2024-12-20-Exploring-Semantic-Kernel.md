@@ -101,10 +101,10 @@ This file contains the prompt template for generating SQL queries. It uses place
 You are an SQL assistant. Based on the instructions and data provided, generate SQL queries.  
 
 ### Instructions:  
-{{$instructions}}  
+`{{$instructions}}`  
 
 ### Data:  
-{{$csvData}}  
+`{{$csvData}}`  
 
 Rules:  
 - If only one table exists, select all columns where status = 'active', limited to 100 rows.  

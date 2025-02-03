@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Azure Solution Architect Renewed
-date:       2025-01-22
+date:       2025-01-27
 summary:    Renewed Azure DevOps certification for one more year.
 categories: Certifications, Azure
 ---

@@ -65,7 +65,7 @@ Following is a screenshot of the installed model:
 **NOTE**: By default, Ollama runs at http://localhost:11434. You can now integrate this local LLM with Semantic Kernel.
 
 
-## **Wofkflow Setup**
+## **Workflow Setup**
 
 All the related files are available in the [Plugin](https://github.com/AdiThakker/SemanticKernel.Plugins/tree/main/SemanticKernel.Plugins/Plugin) folder. Let's revisit the files from the previous post:
 
@@ -101,10 +101,10 @@ This file contains the prompt template for generating SQL queries. It uses place
 You are an SQL assistant. Based on the instructions and data provided, generate SQL queries.  
 
 ### Instructions:  
-`{{$instructions}}`  
+`{$instructions}`  
 
 ### Data:  
-`{{$csvData}}`  
+`{$csvData}`  
 
 Rules:  
 - If only one table exists, select all columns where status = 'active', limited to 100 rows.  

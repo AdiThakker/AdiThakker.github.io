@@ -1,10 +1,12 @@
 ---
 layout:     post
 title:      Semantic Kernel RAG with QDrant - (Post 2)
-date:       2025-04-05
-summary:    Building on our previous post, we replace the in-memory vector store with QDrant for persistent, scalable RAG workflows using Semantic Kernel
+date:       2025-08-26
+summary:    Building on our previous post, we replace the in-memory vector store with QDrant for persistent, scalable RAG workflows using Semantic Kernel  
 categories: Gen AI, Semantic Kernel, RAG, QDrant, Vector Database
 ---
+
+🚀 Heads up! This entire blog post — and the code behind it — was conjured up by the magical powers of GitHub Copilot Coding Agent. I hadn’t blogged in a while, so during a dev session, I decided to throw Copilot Agent into the deep end and see what it could do. What follows is its unfiltered creation — I haven’t poked at it yet for validation, but wow, what a wild and entertaining ride this turned out to be!
 
 In our [previous blog post]({{site.url}}/Semantic-Kernel-Embeddings), we explored how to build a Retrieval Augmented Generation (RAG) workflow using **Semantic Kernel's built-in in-memory store**. While this approach works perfectly for demos and small datasets, it has one significant limitation: **everything disappears when your application restarts**.
 

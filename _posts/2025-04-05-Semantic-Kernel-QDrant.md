@@ -341,7 +341,7 @@ In future posts, we'll explore:
 - **Advanced Filtering**: Complex queries with QDrant's rich filtering capabilities
 - **Performance Optimization**: Tuning QDrant for your specific use case
 
-All the source code for this QDrant integration is available [here](https://github.com/AdiThakker/SemanticKernel.QDrant)
+All the source code for this QDrant integration is available [here](https://github.com/AdiThakker/SemanticKernel.Embeddings/tree/copilot/fix-7aabaf93-eb31-4272-b88f-3956fb130f15)
 
 Ready to build production-grade RAG applications? Give QDrant a try!
 
